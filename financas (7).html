@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha Saúde Financeira</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e4;
+    --surface: #ffffff;
+    --surface2: #eee8d8;
+    --border: #d6cdb8;
+    --text: #003049;
+    --muted: #4a6070;
+    --accent: #C1121F;
+    --accent2: #780000;
+    --red: #C1121F;
+    --green: #2a7c4f;
+    --teal: #003049;
+    --purple: #669BBC;
+    --pink: #C1121F;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 20px; }
+  header { max-width: 960px; margin: 0 auto 40px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px, 5vw, 42px); line-height: 1.1; }
+  header h1 span { color: #C1121F; font-style: italic; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .hbadge { background: #003049; border: 1px solid #003049; border-radius: 100px; padding: 6px 16px; font-size: 13px; color: #f5f0e4; }
+  .grid { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #003049; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .sum-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 8px; }
+  .sum-val { color: #003049; font-family: 'DM Serif Display', serif; font-size: 24px; }
+  .sum-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .green { color: var(--green); } .red { color: var(--red); } .accent { color: var(--accent); }
+  .yellow { color: var(--accent2); } .teal { color: var(--teal); } .purple { color: var(--purple); } .pink { color: var(--pink); }
+  .alert-box { border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .alert-box.warn { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.25); }
+  .alert-box.ok { background: rgba(0,48,73,0.05); border: 1px solid rgba(0,48,73,0.2); }
+  .alert-box.info { background:rgba(100,120,30,0.06); border: 1px solid rgba(200,240,76,0.2); }
+  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .alert-text { font-size: 13px; line-height: 1.7; }
+  .alert-text strong { color: var(--accent); }
+  .alert-text strong.red { color: var(--red); }
+  .alert-text strong.green { color: var(--green); }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tab { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; }
+  .tab.active { background: #C1121F; color: #f5f0e4; border-color: #C1121F; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .cat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .cat-name { font-weight: 600; font-size: 14px; }
+  .cat-total { font-family: 'DM Serif Display', serif; font-size: 21px; }
+  .item-list { display: flex; flex-direction: column; gap: 7px; }
+  .item { display: flex; justify-content: space-between; font-size: 13px; }
+  .item-name { color: var(--muted); flex: 1; padding-right: 8px; }
+  .item-val { font-weight: 500; white-space: nowrap; }
+  .note { font-size: 11px; color: var(--muted); opacity: 0.7; }
+  .divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .bar-row { margin-top: 12px; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .bar-track { background: var(--border); border-radius: 100px; height: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 100px; }
+  .inst-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .inst-table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .inst-table td { padding: 10px 12px; border-bottom: 1px solid #1e1e1e; }
+  .inst-table tr:last-child td { border-bottom: none; }
+  .cbadge { display: inline-block; padding: 2px 9px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+  .b-saude { background: rgba(255,159,243,0.15); color: var(--pink); border: 1px solid rgba(255,159,243,0.3); }
+  .b-casa { background: rgba(76,250,240,0.1); color: var(--teal); border: 1px solid rgba(76,250,240,0.25); }
+  .b-pessoal { background: rgba(192,132,252,0.1); color: var(--purple); border: 1px solid rgba(192,132,252,0.25); }
+  .b-outros { background: rgba(136,136,136,0.1); color: var(--muted); border: 1px solid rgba(136,136,136,0.25); }
+  .b-familia { background: rgba(240,196,76,0.1); color: var(--accent2); border: 1px solid rgba(240,196,76,0.25); }
+  .b-pet { background: rgba(107,255,184,0.1); color: var(--green); border: 1px solid rgba(107,255,184,0.25); }
+  .ctag { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-right: 3px; }
+  .nu { background: #003049; color: white; }
+  .san { background: #780000; color: white; }
+  .itau { background: #C1121F; color: white; }
+  .c6 { background: #003049; color: #ffffff; border: 1px solid #669BBC; }
+  .fin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .fin-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .fin-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 4px; }
+  .fin-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .fin-row { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; border-bottom: 1px solid #1e1e1e; }
+  .fin-row:last-of-type { border-bottom: none; }
+  .fin-row .lbl { color: var(--muted); }
+  .strat { margin-top: 14px; background: rgba(200,240,76,0.06); border: 1px solid rgba(200,240,76,0.2); border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.7; }
+  .strat strong { color: var(--accent); }
+  .prog-wrap { margin: 14px 0 6px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .prog-track { background: var(--border); border-radius: 100px; height: 7px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #669BBC, #003049); }
+  .reimb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .reimb-card { background: var(--surface); border: 1px solid rgba(0,48,73,0.2); border-radius: var(--radius); padding: 18px; }
+  .reimb-title { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+  .reimb-val { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--green); }
+  .reimb-sub { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .timeline { display: flex; flex-direction: column; }
+  .month-row { display: grid; grid-template-columns: 100px 1fr auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .month-row:last-child { border-bottom: none; }
+  .month-name { font-weight: 600; }
+  .month-name.cur { color: var(--accent); }
+  .month-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
+  .tag.a { border-color: #C1121F; color: #C1121F; }
+  .tag.o { border-color: #2a7c4f; color: #2a7c4f; }
+  .tag.i { border-color: #003049; color: #003049; }
+  .month-val { font-family: 'DM Serif Display', serif; font-size: 17px; text-align: right; white-space: nowrap; }
+  .overflow { overflow-x: auto; }
+  .total-row { display: flex; justify-content: space-between; padding: 12px 0 0; font-weight: 600; font-size: 14px; border-top: 1px solid var(--border); margin-top: 8px; }
+  .tip { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.6; }
+  .tip.warn { background: rgba(255,107,107,0.07); border: 1px solid rgba(255,107,107,0.2); color: var(--red); }
+  .tip.ok { background:rgba(100,120,30,0.06); border: 1px solid rgba(200,240,76,0.2); color: var(--accent); }
+  .tip.info { background: rgba(76,250,240,0.07); border: 1px solid rgba(76,250,240,0.2); color: var(--teal); }
+  .c6n { font-size: 10px; color: #780000; opacity: 0.85; margin-left: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Finance<br><span>Planning & Tracking</span></h1>
+    <p class="subtitle">Joyce & Henrique</p>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+      <label style="font-size:12px;color:var(--muted);">Mês:</label>
+      <select id="mes-global" onchange="mudarMes()" style="background:white;border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:#003049;font-size:13px;font-weight:600;cursor:pointer;">
+        <option value="2026-01">Janeiro 2026</option>
+        <option value="2026-02">Fevereiro 2026</option>
+        <option value="2026-03">Março 2026</option>
+        <option value="2026-04">Abril 2026</option>
+        <option value="2026-05" selected>Maio 2026</option>
+        <option value="2026-06">Junho 2026</option>
+        <option value="2026-07">Julho 2026</option>
+        <option value="2026-08">Agosto 2026</option>
+        <option value="2026-09">Setembro 2026</option>
+        <option value="2026-10">Outubro 2026</option>
+        <option value="2026-11">Novembro 2026</option>
+        <option value="2026-12">Dezembro 2026</option>
+        <option value="2027-01">Janeiro 2027</option>
+        <option value="2027-02">Fevereiro 2027</option>
+        <option value="2027-03">Março 2027</option>
+        <option value="2027-04">Abril 2027</option>
+        <option value="2027-05">Maio 2027</option>
+        <option value="2027-06">Junho 2027</option>
+      </select>
+    </div>
+  </div>
+  
+</header>
+
+<div class="grid">
+
+  <!-- RESUMO -->
+  <div>
+    <div class="section-title">📊 Resumo do mês</div>
+    <div class="summary-row">
+      <div class="sum-card"><div class="sum-label">Renda</div><div class="sum-val accent">R$ 15.200</div><div class="sum-sub">Salário líquido</div></div>
+      <div class="sum-card"><div class="sum-label">Gastos fixos</div><div class="sum-val yellow">R$ 7.334</div><div class="sum-sub">Casa + saúde + pessoal</div></div>
+      <div class="sum-card"><div class="sum-label">Faturas (mês outlier)</div><div class="sum-val red">~R$ 20.000</div><div class="sum-sub">EUA + passagem Paris</div></div>
+      <div class="sum-card"><div class="sum-label">Parcelas futuras</div><div class="sum-val purple">~R$ 1.950</div><div class="sum-sub">Comprometidas próx. meses</div></div>
+      <div class="sum-card"><div class="sum-label">Reembolsos a receber</div><div class="sum-val green">R$ 2.414</div><div class="sum-sub">Plano + empresa + família</div></div>
+    </div>
+  </div>
+
+  <!-- ABAS -->
+  <div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('registros',this)">✏️ Input</button>
+      <button class="tab" onclick="showTab('gastos',this)">🛍️ Gastos</button>
+      <button class="tab" onclick="showTab('controle',this)">🔒 Controle</button>
+      <button class="tab" onclick="showTab('fluxo',this)">💰 Fluxo de Caixa</button>
+      <button class="tab" onclick="showTab('cartoes',this)">💳 Cartões</button>
+      <button class="tab" onclick="showTab('casal',this)">👫 Casal</button>
+      <button class="tab" onclick="showTab('parcelas',this)">📅 Parcelas</button>
+      <button class="tab" onclick="showTab('fin',this)">🏠 Financiamentos</button>
+      <button class="tab" onclick="showTab('reimb',this)">💚 Reembolsos</button>
+      <button class="tab" onclick="showTab('proj',this)">📈 Projeção mai–dez</button>
+      <button class="tab" onclick="showTab('plano',this)">🎯 Plano 2026</button>
+    </div>
+
+    <!-- CONTROLE -->
+    <div id="tab-controle" class="tab-content">
+      <div style="margin-bottom:20px;font-size:13px;color:var(--muted);">
+        Visão dos seus gastos dividida em <strong style="color:#C1121F">obrigações</strong> (não dá pra parar) e <strong style="color:#003049">flexíveis</strong> (dá pra reduzir ou cancelar).
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+
+        <!-- OBRIGAÇÕES -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#C1121F;">🔒 Não posso parar</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#C1121F;" id="total-fixo">R$ 8.232</div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+            <div style="background:#C1121F;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">🏠 Moradia e contratos</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Financiamento casa (sua metade)</span><span style="font-weight:500">R$ 1.325</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Financiamento carro (sua metade)</span><span style="font-weight:500">R$ 1.325</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Condomínio (sua metade)</span><span style="font-weight:500">R$ 500</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">CPFL (sua metade)</span><span style="font-weight:500">R$ 125</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">IPTU</span><span style="font-weight:500">R$ 57,50</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Seguro carro</span><span style="font-weight:500">R$ 175</span></div>
+            </div>
+
+            <div style="background:#780000;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">🛒 Alimentação</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Mercado — Carrefour + Açougue (C6÷2)</span><span style="font-weight:500">R$ 410</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Hortifruti (C6÷2)</span><span style="font-weight:500">R$ 57,30</span></div>
+            </div>
+
+            <div style="background:#C1121F;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">💊 Saúde essencial</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Remédios rotina (Drogasil)</span><span style="font-weight:500">R$ 266,54</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Remédios mãe (Dom Pedro)</span><span style="font-weight:500">R$ 169,08</span></div>
+            </div>
+
+            <div style="background:#780000;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">📅 Parcelas em aberto</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Mounjaro NuPay (1/3)</span><span style="font-weight:500">R$ 593,15</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Anticoncepcional (1/3)</span><span style="font-weight:500">R$ 75,83</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Marcenaria Evo*Kless — C6÷2 (11/12)</span><span style="font-weight:500">R$ 794,45</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Geladeira ML — C6÷2 (5/10)</span><span style="font-weight:500">R$ 156,37</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">ML 2 itens — C6÷2 (3/6)</span><span style="font-weight:500">R$ 84,21</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Amazon Marketplace — C6÷2 (3/10)</span><span style="font-weight:500">R$ 25,11</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Tokstok — última (10/10)</span><span style="font-weight:500">R$ 293,15</span></div>
+            </div>
+            <div style="background:rgba(120,0,0,0.06);padding:10px 14px;display:flex;justify-content:space-between;font-size:12px;color:#780000;font-weight:500;">
+              <span>Subtotal parcelas</span><span>R$ 2.022,27</span>
+            </div>
+
+            <div style="background:rgba(193,18,31,0.08);padding:12px 14px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px solid rgba(193,18,31,0.15);">
+              <span>Total obrigações</span>
+              <span style="color:#C1121F">R$ 8.232</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLEXÍVEIS -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#003049;">✂️ Posso reduzir</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#003049;" id="total-flex">R$ 5.891</div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+
+            <div style="background:#003049;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">📱 Assinaturas</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Cycle Club <span style="font-size:11px;color:#2a7c4f">(empresa reimb. 70%)</span></span><span style="font-weight:500">R$ 549</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Apple (iCloud, TV+)</span><span style="font-weight:500">R$ 124,70</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Mensalidade cartão Itaú</span><span style="font-weight:500">R$ 105</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Spotify</span><span style="font-weight:500">R$ 31,90</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Netflix</span><span style="font-weight:500">R$ 20,90</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Amazon Prime</span><span style="font-weight:500">R$ 19,90</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Contracurso</span><span style="font-weight:500">R$ 19,90</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">SCP Plus</span><span style="font-weight:500">R$ 20,84</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Meli Mais + iFood Club</span><span style="font-weight:500">R$ 17,85</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Claude 🤖</span><span style="font-weight:500">R$ 109,90</span></div>
+            </div>
+
+            <div style="background:#003049;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">💊 Saúde (reduzível)</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Mounjaro <span style="font-size:11px;color:#C1121F">(até out/26)</span></span><span style="font-weight:500">R$ 1.800</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Terapia — Tomiris Barcelos <span style="font-size:11px;color:#2a7c4f">(plano reimb. R$1.515)</span></span><span style="font-weight:500">R$ 2.182</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Psiquiatra — Andrea Nakata <span style="font-size:11px;color:#2a7c4f">(plano reimb. R$475)</span></span><span style="font-weight:500">R$ 785,70</span></div>
+            </div>
+
+            <div style="background:#669BBC;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">🍽️ Restaurantes e lazer</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Restaurantes (C6÷2)</span><span style="font-weight:500">~R$ 272</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Gastos Pessoais</span><span style="font-weight:500">variável</span></div>
+            </div>
+
+            <div style="background:#003049;padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">👨‍👩‍👧 Família (flexível)</div>
+            <div style="padding:0 14px;">
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e3dc;font-size:13px;"><span style="color:var(--muted)">Compras avó (Amazon + ML + Shopee)</span><span style="font-weight:500">~R$ 433</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:13px;"><span style="color:var(--muted)">Consulta veterinária Angel</span><span style="font-weight:500">eventual</span></div>
+            </div>
+
+            <div style="background:rgba(0,48,73,0.08);padding:12px 14px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;">
+              <span>Subtotal flexíveis</span>
+              <span style="color:#003049">R$ 7.491+</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- resumo -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px;">
+        <div style="background:rgba(193,18,31,0.06);border:1px solid rgba(193,18,31,0.2);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Obrigações</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#C1121F">R$ 8.232</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">54% da renda</div>
+        </div>
+        <div style="background:rgba(0,48,73,0.06);border:1px solid rgba(0,48,73,0.2);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Flexíveis</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#003049">R$ 7.491+</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">49% da renda</div>
+        </div>
+        <div style="background:rgba(42,124,79,0.06);border:1px solid rgba(42,124,79,0.2);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Reembolsos a receber</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#2a7c4f">R$ 2.414</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">compensam parte dos flexíveis</div>
+        </div>
+        <div style="background:rgba(102,155,188,0.08);border:1px solid rgba(102,155,188,0.3);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Se cortar tudo flexível</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#669BBC">R$ 8.332</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">sobra máxima teórica</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FLUXO DE CAIXA -->
+    <div id="tab-fluxo" class="tab-content">
+      <div style="margin-bottom:18px;font-size:13px;color:var(--muted);">
+        Atualize o saldo, salário e faturas variáveis. As contas aparecem ordenadas por vencimento com o saldo após cada pagamento.
+      </div>
+
+      <!-- inputs topo -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px;">
+        <div class="sum-card">
+          <div class="sum-label">Saldo em conta</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span style="font-size:13px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-saldo" value="0" step="0.01" placeholder="0,00" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;font-weight:600;width:100%;" oninput="calcFluxo()">
+          </div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Salário (dia 1)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span style="font-size:13px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-salario" value="15200" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;font-weight:600;width:100%;" oninput="calcFluxo()">
+          </div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Reembolsos esperados</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <span style="font-size:13px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-reimb" value="2414" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:15px;font-weight:600;width:100%;" oninput="calcFluxo()">
+          </div>
+        </div>
+      </div>
+
+      <!-- faturas variáveis -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;">📋 Faturas do mês</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fatura C6 (total) · dia 5</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-c6" value="5534" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fatura Santander · dia 5</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-san" value="9501" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fatura Itaú · dia 7</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-itau" value="8801" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Fatura Nubank · dia 8</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-nu" value="595" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">Condomínio (total) · dia 10</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-cond" value="1000" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;">CPFL (total) · dia 10</label>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;color:var(--muted)">R$</span>
+            <input type="number" id="fl-cpfl" value="250" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100%;" oninput="calcFluxo()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tabela fluxo -->
+      <div style="overflow-x:auto;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap">Dia</th>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Descrição</th>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Tipo</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Valor</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Saldo após</th>
+            </tr>
+          </thead>
+          <tbody id="fl-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- resumo -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
+        <div style="background:rgba(107,255,184,0.07);border:1px solid rgba(107,255,184,0.25);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Total entradas</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--green)" id="fl-total-entrada">—</div>
+        </div>
+        <div style="background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.25);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Total saídas</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--red)" id="fl-total-saida">—</div>
+        </div>
+        <div style="background:rgba(100,120,30,0.06);border:1px solid rgba(200,240,76,0.25);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Saldo final</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;" id="fl-saldo-final">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTROS -->
+    <div id="tab-registros" class="tab-content active">
+      <div style="margin-bottom:6px;font-size:13px;color:var(--muted);">Registre seus gastos aqui — eles ficam salvos no Google Sheets e você pode consultar por mês e categoria.</div>
+      <!-- FORMULÁRIO DE NOVO GASTO -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:24px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:17px;color:#003049;margin-bottom:16px;">➕ Adicionar novo gasto</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Data</label>
+            <input type="date" id="ng-data" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+          </div>
+          <div style="grid-column: span 2;">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Descrição</label>
+            <input type="text" id="ng-desc" placeholder="Ex: Mercado Carrefour" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Valor (R$)</label>
+            <input type="number" id="ng-valor" placeholder="0,00" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Cartão</label>
+            <select id="ng-cartao" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+              <option value="">Selecionar</option>
+              <option value="Nubank">Nubank</option>
+              <option value="Santander">Santander</option>
+              <option value="Itaú">Itaú</option>
+              <option value="C6">C6 (÷2)</option>
+              <option value="Pix">Pix</option>
+              <option value="Débito">Débito</option>
+              <option value="Dinheiro">Dinheiro</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Categoria</label>
+            <select id="ng-cat" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+              <option value="">Selecionar</option>
+              <option value="Casa">Casa</option>
+              <option value="Alimentação">Alimentação</option>
+              <option value="Restaurantes">Restaurantes</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Gastos Pessoais">Gastos Pessoais</option>
+              <option value="Assinatura">Assinatura</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Família">Família</option>
+              <option value="Pet">Pet</option>
+              <option value="Viagem">Viagem</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;">Observação (opcional)</label>
+            <input type="text" id="ng-obs" placeholder="Ex: parcelado 3x, reembolso empresa..." style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button onclick="salvarGasto()" style="background:#C1121F;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;">Salvar gasto</button>
+          <button onclick="limparForm()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;">Limpar</button>
+          <span id="ng-status" style="font-size:13px;"></span>
+        </div>
+      </div>
+
+      <!-- GASTOS SALVOS NO SHEETS -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+          <div style="font-family:'DM Serif Display',serif;font-size:17px;color:#003049;">📋 Gastos registrados</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <select id="filtro-mes" onchange="carregarGastos()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;">
+              <option value="">Todos os meses</option>
+              <option value="2026-01">Jan/26</option>
+              <option value="2026-02">Fev/26</option>
+              <option value="2026-03">Mar/26</option>
+              <option value="2026-04">Abr/26</option>
+              <option value="2026-05" selected>Mai/26</option>
+              <option value="2026-06">Jun/26</option>
+              <option value="2026-07">Jul/26</option>
+              <option value="2026-08">Ago/26</option>
+              <option value="2026-09">Set/26</option>
+              <option value="2026-10">Out/26</option>
+              <option value="2026-11">Nov/26</option>
+              <option value="2026-12">Dez/26</option>
+              <option value="2027-01">Jan/27</option>
+              <option value="2027-02">Fev/27</option>
+              <option value="2027-03">Mar/27</option>
+              <option value="2027-04">Abr/27</option>
+              <option value="2027-05">Mai/27</option>
+              <option value="2027-06">Jun/27</option>
+            </select>
+            <select id="filtro-cat" onchange="carregarGastos()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;">
+              <option value="">Todas categorias</option>
+              <option value="Casa">Casa</option>
+              <option value="Alimentação">Alimentação</option>
+              <option value="Restaurantes">Restaurantes</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Gastos Pessoais">Gastos Pessoais</option>
+              <option value="Assinatura">Assinatura</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Família">Família</option>
+              <option value="Pet">Pet</option>
+              <option value="Viagem">Viagem</option>
+              <option value="Outros">Outros</option>
+            </select>
+            <button onclick="carregarGastos()" style="background:#003049;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">↻ Atualizar</button>
+          </div>
+        </div>
+        <div id="gastos-lista" style="font-size:13px;color:var(--muted);text-align:center;padding:20px 0;">
+          Clique em "Atualizar" para carregar os gastos salvos
+        </div>
+        <div id="gastos-total" style="display:none;padding:12px 0 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-top:8px;">
+          <span>Total filtrado</span><span id="gastos-total-val" style="color:#C1121F"></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CARTÕES -->
+    <div id="tab-cartoes" class="tab-content">
+
+      <!-- sub-tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+        <button class="tab active" id="stab-c6" onclick="showSubTab('c6',this)" style="font-size:12px;padding:6px 14px;">C6</button>
+        <button class="tab" id="stab-san" onclick="showSubTab('san',this)" style="font-size:12px;padding:6px 14px;">Santander</button>
+        <button class="tab" id="stab-itau" onclick="showSubTab('itau',this)" style="font-size:12px;padding:6px 14px;">Itaú</button>
+        <button class="tab" id="stab-nu" onclick="showSubTab('nu',this)" style="font-size:12px;padding:6px 14px;">Nubank</button>
+      </div>
+
+      <!-- C6 -->
+      <div id="subtab-c6">
+        <div id="cartao-c6-content"><div style="text-align:center;padding:30px;color:var(--muted)">Carregando...</div></div>
+      </div>
+
+      <!-- SANTANDER -->
+      <div id="subtab-san" style="display:none;">
+        <div id="cartao-san-content"><div style="text-align:center;padding:30px;color:var(--muted)">Carregando...</div></div>
+      </div>
+
+      <!-- ITAÚ -->
+      <div id="subtab-itau" style="display:none;">
+        <div id="cartao-itau-content"><div style="text-align:center;padding:30px;color:var(--muted)">Carregando...</div></div>
+      </div>
+
+      <!-- NUBANK -->
+      <div id="subtab-nu" style="display:none;">
+        <div id="cartao-nu-content"><div style="text-align:center;padding:30px;color:var(--muted)">Carregando...</div></div>
+      </div>
+
+    </div>
+
+    <!-- CASAL -->
+    <div id="tab-casal" class="tab-content">
+      <div style="margin-bottom:18px;font-size:13px;color:var(--muted);">
+        Atualize os valores variáveis todo mês (condomínio, CPFL e fatura C6) para saber o valor exato que seu marido precisa te transferir.
+      </div>
+
+      <!-- campos editáveis -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:16px;">📝 Valores variáveis do mês</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Condomínio (total)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13px;color:var(--muted)">R$</span>
+              <input type="number" id="inp-cond" value="1000" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;width:120px;" oninput="calcCasal()">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">CPFL (total)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13px;color:var(--muted)">R$</span>
+              <input type="number" id="inp-cpfl" value="250" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;width:120px;" oninput="calcCasal()">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Fatura C6 (total)</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13px;color:var(--muted)">R$</span>
+              <input type="number" id="inp-c6" value="5534" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:14px;width:120px;" oninput="calcCasal()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- pagamentos extras -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:6px;">💳 Pagamentos extras (a dividir)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Coloque aqui tudo que um de vocês pagou mas deve ser dividido 50/50</div>
+
+        <!-- Joyce -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:600;color:var(--teal);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Pagos por Joyce</div>
+          <div id="joyce-items" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button onclick="addItem('joyce')" style="margin-top:10px;background:transparent;border:1px dashed var(--border);border-radius:8px;padding:7px 14px;color:var(--muted);font-size:12px;cursor:pointer;width:100%;">+ adicionar item</button>
+        </div>
+
+        <div style="height:1px;background:var(--border);margin-bottom:16px;"></div>
+
+        <!-- Henrique -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Pagos por Henrique</div>
+          <div id="henrique-items" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button onclick="addItem('henrique')" style="margin-top:10px;background:transparent;border:1px dashed var(--border);border-radius:8px;padding:7px 14px;color:var(--muted);font-size:12px;cursor:pointer;width:100%;">+ adicionar item</button>
+        </div>
+      </div>
+
+      <!-- tabela de contas -->
+      <div style="overflow-x:auto;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Conta</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Total</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Joyce</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Marido</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Financiamento casa</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right">R$ 2.650,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)">R$ 1.325,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)">R$ 1.325,00</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Financiamento carro</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right">R$ 2.650,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)">R$ 1.325,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)">R$ 1.325,00</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Seguro carro</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right">R$ 350,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)">R$ 175,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)">R$ 175,00</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">IPTU</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right">R$ 115,00</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)">R$ 57,50</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)">R$ 57,50</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Condomínio <span style="font-size:11px;color:var(--accent2)">(variável)</span></td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right" id="tot-cond">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)" id="joy-cond">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)" id="mar-cond">—</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">CPFL <span style="font-size:11px;color:var(--accent2)">(variável)</span></td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right" id="tot-cpfl">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)" id="joy-cpfl">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)" id="mar-cpfl">—</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Fatura C6 <span style="font-size:11px;color:var(--accent2)">(variável)</span></td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right" id="tot-c6">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)" id="joy-c6">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)" id="mar-c6">—</td>
+            </tr>
+            <tr id="row-joy-extra" style="display:none">
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Extras pagos por Joyce <span style="font-size:11px;color:var(--teal)">(÷2)</span></td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right" id="tot-joy-extra">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)" id="joy-joy-extra">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)" id="mar-joy-extra">—</td>
+            </tr>
+            <tr id="row-hen-extra" style="display:none">
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">Extras pagos por Henrique <span style="font-size:11px;color:var(--accent)">(÷2)</span></td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right" id="tot-hen-extra">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--teal)" id="joy-hen-extra">—</td>
+              <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent)" id="mar-hen-extra">—</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td style="padding:12px;border-top:1px solid var(--border);font-weight:600;font-size:14px;background:var(--surface2)">Total</td>
+              <td style="padding:12px;border-top:1px solid var(--border);text-align:right;font-weight:600;font-size:14px;background:var(--surface2)" id="tot-total">—</td>
+              <td style="padding:12px;border-top:1px solid var(--border);text-align:right;font-weight:600;font-size:14px;background:var(--surface2);color:var(--teal)" id="joy-total">—</td>
+              <td style="padding:12px;border-top:1px solid var(--border);text-align:right;font-weight:600;font-size:14px;background:var(--surface2);color:var(--accent)" id="mar-total">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- destaque transferência -->
+      <div style="background:rgba(100,120,30,0.08);border:1px solid rgba(200,240,76,0.3);border-radius:var(--radius);padding:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px" id="transferencia-label">Henrique transfere para Joyce</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:38px;color:var(--accent)" id="transferencia">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">valor líquido considerando quem pagou o quê</div>
+        </div>
+        <div style="font-size:32px">💸</div>
+      </div>
+
+    </div>
+
+    <!-- GASTOS -->
+    <div id="tab-gastos" class="tab-content">
+      <div style="margin-bottom:14px;font-size:13px;color:var(--muted);">
+        <span class="ctag nu">Nubank</span> <span class="ctag san">Santander</span> <span class="ctag itau">Itaú</span> <span class="ctag c6">C6</span>
+        <span style="color:#780000;font-size:11px;margin-left:8px;">⚠️ C6: todos os valores já ÷2 (sua metade)</span>
+      </div>
+
+      <div class="cat-grid">
+
+        <!-- CASA -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">🏠 Casa (sua metade)</div><div class="cat-total teal">R$ 3.521</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Financiamento casa</span><span class="item-val">R$ 1.325</span></div>
+            <div class="item"><span class="item-name">Condomínio</span><span class="item-val">R$ 500</span></div>
+            <div class="item"><span class="item-name">CPFL <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 125</span></div>
+            <div class="item"><span class="item-name">IPTU</span><span class="item-val">R$ 57,50</span></div>
+            <div class="item"><span class="item-name">Mercado — Carrefour + Açougue <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 410,01</span></div>
+            <div class="divider"></div>
+            <div class="item"><span class="item-name">Marcenaria Evo*Kless <span class="note">(parcela 11/12) <span class="c6n">C6÷2</span></span></span><span class="item-val">R$ 794,45</span></div>
+            <div class="item"><span class="item-name">Geladeira ML <span class="note">(parcelada)</span></span><span class="item-val">R$ 312,74</span></div>
+            <div class="item"><span class="item-name">ML Loja Construção</span><span class="item-val">R$ 134,90</span></div>
+            <div class="item"><span class="item-name">Amazon/ML compras casa</span><span class="item-val">~R$ 420</span></div>
+          </div>
+          <div class="tip ok">✅ Marcenaria Evo*Kless encerra em junho — libera R$794/mês a partir de julho!</div>
+          <div class="bar-row"><div class="bar-label"><span>% da renda</span><span>23%</span></div><div class="bar-track"><div class="bar-fill" style="width:23%;background:#003049"></div></div></div>
+        </div>
+
+        <!-- CARRO E TRANSPORTE -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">🚗 Carro e Transporte</div><div class="cat-total yellow">R$ 1.733</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Financiamento carro (sua metade)</span><span class="item-val">R$ 1.325</span></div>
+            <div class="item"><span class="item-name">Seguro carro</span><span class="item-val">R$ 175</span></div>
+            <div class="item"><span class="item-name">Combustível — Posto Avenida (5x) <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 250</span></div>
+            <div class="item"><span class="item-name">Estacionamentos (Vieira Park + Carpark)</span><span class="item-val">R$ 83</span></div>
+            <div class="item"><span class="item-name">Uber Brasil</span><span class="item-val">R$ 16,97</span></div>
+            <div class="item"><span class="item-name">Uber EUA <span class="note">(reembolso folha mai ✅)</span></span><span class="item-val">~R$ 880</span></div>
+            <div class="divider"></div>
+            <div class="item"><span class="item-name" style="color:var(--muted);font-size:12px;">Campos para próximos meses:</span></div>
+            <div class="item"><span class="item-name">IPVA <span class="note">(quando vencer)</span></span><span class="item-val note">—</span></div>
+            <div class="item"><span class="item-name">Manutenção <span class="note">(revisão, pneus, etc)</span></span><span class="item-val note">—</span></div>
+          </div>
+          <div class="bar-row"><div class="bar-label"><span>% da renda</span><span>11%</span></div><div class="bar-track"><div class="bar-fill" style="width:11%;background:#780000"></div></div></div>
+        </div>
+
+        <!-- SAÚDE PESSOAL -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">💊 Saúde pessoal</div><div class="cat-total pink">R$ 5.620</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Mounjaro <span class="note">(RD Saude, mar/26)</span></span><span class="item-val">R$ 1.759,64</span></div>
+            <div class="item"><span class="item-name">Mounjaro NuPay parcela 1/3 <span class="note">(antecipar próx. mês)</span></span><span class="item-val">R$ 593,15</span></div>
+            <div class="item"><span class="item-name">Endocrinologista <span class="note">(reembolso plano R$475)</span></span><span class="item-val">R$ 489,31</span></div>
+            <div class="item"><span class="item-name">Psiquiatra — Andrea Nakata</span><span class="item-val">R$ 785,70</span></div>
+            <div class="item"><span class="item-name">Terapia — Tomiris Barcelos</span><span class="item-val">R$ 2.182,17</span></div>
+            <div class="item"><span class="item-name">Remédios rotina Drogasil <span class="note">(crédito parcelado)</span></span><span class="item-val">R$ 266,54</span></div>
+            <div class="item"><span class="item-name">Farmácia — compra pontual <span class="note">(Santander)</span></span><span class="item-val">R$ 220,46</span></div>
+            <div class="item"><span class="item-name">Farmácia — Vitamina D</span><span class="item-val">R$ 166</span></div>
+            <div class="item"><span class="item-name">Anticoncepcional <span class="note">(parcela 1/3)</span></span><span class="item-val">R$ 75,83</span></div>
+            <div class="divider"></div>
+            <div class="item"><span class="item-name" style="color:var(--green)">Reembolso plano — terapia <span class="note">(já recebido)</span></span><span class="item-val green">-R$ 1.515</span></div>
+            <div class="item"><span class="item-name" style="color:var(--green)">Reembolso plano — psiquiatra</span><span class="item-val green">-R$ 475</span></div>
+            <div class="item"><span class="item-name"><strong>Total líquido saúde</strong></span><span class="item-val pink"><strong>~R$ 2.552</strong></span></div>
+          </div>
+          <div class="bar-row"><div class="bar-label"><span>% da renda (líquido)</span><span>15%</span></div><div class="bar-track"><div class="bar-fill" style="width:15%;background:#C1121F"></div></div></div>
+        </div>
+
+        <!-- ANGEL -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">🐾 Angel</div><div class="cat-total green">R$ 739</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Tapetinho extra <span class="c6n">(TikTok C6÷2)</span></span><span class="item-val">R$ 45,95</span></div>
+            <div class="item"><span class="item-name">Petz <span class="note">(parcela 2/2 — última!)</span></span><span class="item-val">R$ 144,88</span></div>
+            <div class="item"><span class="item-name">Consulta veterinária</span><span class="item-val">R$ 260</span></div>
+            <div class="item"><span class="item-name">Ração <span class="note">(Santander)</span></span><span class="item-val">R$ 105</span></div>
+          </div>
+          <div class="tip ok">✅ Petz encerra esse mês — libera R$144,88 em maio.</div>
+        </div>
+
+        <!-- FAMÍLIA -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">👨‍👩‍👧 Família</div><div class="cat-total yellow">R$ 908,75</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Remédios mãe — Drogaria Dom Pedro <span class="note">(parcela 2/4)</span></span><span class="item-val">R$ 169,08</span></div>
+            <div class="item"><span class="item-name">Cadeira de banho avó <span class="note">(Shopee)</span></span><span class="item-val">R$ 271,43</span></div>
+            <div class="item"><span class="item-name">Compras avó <span class="note">(Amazon)</span></span><span class="item-val">R$ 92,54</span></div>
+            <div class="item"><span class="item-name">Trocafone <span class="note">(prima reembolsa)</span></span><span class="item-val">R$ 283,25</span></div>
+          </div>
+          <div class="tip info">💙 Prima reembolsa R$283,25/mês até dez/26.</div>
+        </div>
+
+        <!-- VIAGEM EUA -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">✈️ Viagem EUA (outlier)</div><div class="cat-total red">R$ 7.200+</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Passagem Porto→Paris (Kiwi)</span><span class="item-val">R$ 1.560,43</span></div>
+            <div class="item"><span class="item-name">Amazon EUA (compras casa)</span><span class="item-val">R$ 2.807,80</span></div>
+            <div class="item"><span class="item-name">Target</span><span class="item-val">US$ 165,60</span></div>
+            <div class="item"><span class="item-name">Uber EUA <span class="note">(reembolso empresa — folha mai)</span></span><span class="item-val">US$ 158,38</span></div>
+            <div class="item"><span class="item-name">Iporte st2456</span><span class="item-val">US$ 33,64</span></div>
+            <div class="item"><span class="item-name">Hotel Charme <span class="note">(parcela 3/3 — última)</span></span><span class="item-val">R$ 890,40</span></div>
+            <div class="item"><span class="item-name">Arlo Midtown NY</span><span class="item-val">R$ 16,05 + IOF</span></div>
+          </div>
+          <div class="tip warn">⚠️ Mês atípico. Uber EUA entra como reembolso na folha de maio.</div>
+        </div>
+
+        <!-- ASSINATURAS -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">📱 Assinaturas</div><div class="cat-total purple">R$ 1.256</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Cycle Club <span class="note">(empresa reimb. 70%)</span></span><span class="item-val">R$ 549</span></div>
+            <div class="item"><span class="item-name">Vivo <span class="note">(empresa reembolsa — começar já!)</span></span><span class="item-val">R$ 97,01</span></div>
+            <div class="item"><span class="item-name">Microsoft <span class="note">(pai reembolsa)</span></span><span class="item-val">R$ 167,20</span></div>
+            <div class="item"><span class="item-name">Apple (iCloud, TV, etc)</span><span class="item-val">R$ 124,70</span></div>
+            <div class="item"><span class="item-name">Spotify</span><span class="item-val">R$ 31,90</span></div>
+            <div class="item"><span class="item-name">Netflix</span><span class="item-val">R$ 20,90</span></div>
+            <div class="item"><span class="item-name">Amazon Prime</span><span class="item-val">R$ 19,90</span></div>
+            <div class="item"><span class="item-name">Meli Mais + iFood Club</span><span class="item-val">R$ 17,85</span></div>
+            <div class="item"><span class="item-name">Contracurso</span><span class="item-val">R$ 19,90</span></div>
+            <div class="item"><span class="item-name">SCP Plus</span><span class="item-val">R$ 20,84</span></div>
+            <div class="item"><span class="item-name">Mensalidade cartão Itaú</span><span class="item-val">R$ 105</span></div>
+            <div class="item"><span class="item-name">Claude 🤖</span><span class="item-val">R$ 109,90</span></div>
+            <div class="divider"></div>
+            <div class="item"><span class="item-name" style="color:var(--green)">Reembolsos (Cycle + Vivo + Microsoft)</span><span class="item-val green">-R$ 648,51</span></div>
+          </div>
+          <div class="tip ok">💡 3 cobranças Apple no mês — vale conferir se há duplicidade.</div>
+        </div>
+
+        <!-- MODA -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">👗 Gastos Pessoais</div><div class="cat-total purple">R$ 1.075</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Hering/Vestvilla <span class="note">(1x, não parcelado)</span></span><span class="item-val">R$ 549,96</span></div>
+            <div class="item"><span class="item-name">Granado Pharmacias</span><span class="item-val">R$ 345</span></div>
+            <div class="item"><span class="item-name">Amazon — gelo seco</span><span class="item-val">R$ 26</span></div>
+          <div class="item"><span class="item-name">Insider <span class="note">(compra pontual de roupa)</span></span><span class="item-val">R$ 140</span></div>
+            <div class="item"><span class="item-name">Dux Nutrition</span><span class="item-val">R$ 38,58</span></div>
+          </div>
+        </div>
+
+        <!-- RESTAURANTES -->
+        <div class="cat-card">
+          <div class="cat-header"><div class="cat-name">🍽️ Restaurantes</div><div class="cat-total yellow">R$ 487</div></div>
+          <div class="item-list">
+            <div class="item"><span class="item-name">Carrefour iFood <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 121,10</span></div>
+            <div class="item"><span class="item-name">Hortifrut <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 57,30</span></div>
+            <div class="item"><span class="item-name">Madeira e Cobre Café <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 47</span></div>
+            <div class="item"><span class="item-name">Lemontee Padaria <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 47,03</span></div>
+            <div class="item"><span class="item-name">IFD*Pic Restaurante <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 49,36</span></div>
+            <div class="item"><span class="item-name">IFD*Zetu <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 53,41</span></div>
+            <div class="item"><span class="item-name">Taco Bell <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 22,85</span></div>
+            <div class="item"><span class="item-name">Rappi <span class="note">(Nubank)</span></span><span class="item-val">R$ 24,90</span></div>
+          <div class="item"><span class="item-name">Home Burguer <span class="c6n">(C6÷2)</span></span><span class="item-val">R$ 65</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PARCELAS -->
+    <div id="tab-parcelas" class="tab-content">
+      <div class="card" style="padding:0;">
+        <div class="overflow">
+        <table class="inst-table">
+          <thead>
+            <tr><th>Item</th><th>Cartão</th><th>Cat.</th><th>Parcela</th><th>Valor/mês</th><th>Término</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Mounjaro NuPay <span style="font-size:11px;color:var(--accent)">(antecipar 2 próx.)</span></td><td><span class="ctag nu">Nu</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/3</td><td class="pink">R$ 593,15</td><td>Jul/26</td></tr>
+            <tr><td>Remédios rotina (Drogasil)</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/2</td><td class="pink">R$ 266,54</td><td><strong style="color:var(--green)">Jun/26 ✅</strong></td></tr>
+            <tr><td>Remédios mãe (Dom Pedro)</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-familia">Família</span></td><td>2/4</td><td class="yellow">R$ 169,08</td><td>Ago/26</td></tr>
+            <tr><td>Marcenaria Evo*Kless <span style="font-size:11px;color:#780000">C6÷2</span></td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>11/12</td><td class="teal">R$ 794,45</td><td><strong style="color:var(--green)">Jun/26 ✅</strong></td></tr>
+            <tr><td>Tokstok (última)</td><td><span class="ctag itau">Itaú</span></td><td><span class="cbadge b-casa">Casa</span></td><td>10/10</td><td class="teal">R$ 293,15</td><td><strong style="color:var(--green)">Mai/26 ✅</strong></td></tr>
+            <tr><td>Geladeira ML</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>5/10</td><td class="teal">R$ 312,74</td><td>Set/26</td></tr>
+            <tr><td>Trocafone (prima reembolsa)</td><td><span class="ctag itau">Itaú</span></td><td><span class="cbadge b-outros">Reembolso</span></td><td>4/12</td><td>R$ 283,25</td><td>Dez/26</td></tr>
+            <tr><td>Anticoncepcional</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/3</td><td class="pink">R$ 75,83</td><td>Jun/26</td></tr>
+            <tr><td>Amazon Marketplace</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>3/10</td><td class="teal">R$ 50,22</td><td>Nov/26</td></tr>
+            <tr><td>Mercado Livre (2 compras)</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>3/6</td><td class="teal">R$ 168,42</td><td>Ago/26</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="total-row"><span>Total comprometido em parcelas</span><span class="red">~R$ 1.950/mês</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px;">🎉 <strong style="color:var(--accent)">A partir de julho: Marcenaria + Drogasil + Tokstok encerram — libera ~R$1.353/mês!</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCIAMENTOS -->
+    <div id="tab-fin" class="tab-content">
+      <div class="fin-grid">
+        <div class="fin-card">
+          <div class="fin-title">🏠 Casa</div>
+          <div class="fin-sub">Caixa Econômica · Jan/2024 · SAC</div>
+          <div class="fin-row"><span class="lbl">Valor do imóvel</span><span>R$ 345.000</span></div>
+          <div class="fin-row"><span class="lbl">Valor financiado</span><span>R$ 247.654</span></div>
+          <div class="fin-row"><span class="lbl">Saldo devedor</span><span class="red">R$ 240.133</span></div>
+          <div class="fin-row"><span class="lbl">Taxa efetiva</span><span>10,49% a.a.</span></div>
+          <div class="fin-row"><span class="lbl">Sistema</span><span class="green">SAC ✅</span></div>
+          <div class="fin-row"><span class="lbl">Parcela atual (casal)</span><span>~R$ 2.650</span></div>
+          <div class="fin-row"><span class="lbl">FGTS disponível</span><span class="green">R$ 43.555</span></div>
+          <div class="fin-row"><span class="lbl">FGTS mensal</span><span class="green">+R$ 1.600/mês</span></div>
+          <div class="fin-row"><span class="lbl">🎯 Meta quitação</span><span class="accent">Maio/2028</span></div>
+          <div class="fin-row"><span class="lbl">💰 Economia em juros</span><span class="green">~R$ 308.000</span></div>
+          <div class="prog-wrap">
+            <div class="prog-label"><span>Progresso</span><span>~1,5% quitado</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:1.5%"></div></div>
+          </div>
+          <div class="strat">
+            <strong>🎯 Plano de quitação — passo a passo:</strong><br><br>
+            <strong>Mai/26:</strong> FGTS R$43.000 → saldo R$187.533<br>
+            <strong>Ago–Dez/26:</strong> + R$2.000/mês extra → saldo R$170.604<br>
+            <strong>Jan/27:</strong> + R$6.000/mês (inclui carro quitado)<br>
+            <strong>Fev/27 → Abr/28:</strong> + R$7.000/mês<br>
+            <strong>Mai/28:</strong> FGTS ~R$40.695 → <strong>R$ 0 ✅🎉</strong><br><br>
+            <strong>Evolução do saldo devedor:</strong><br>
+            Mai/26 → R$187.533 · Dez/26 → R$170.604<br>
+            Jun/27 → R$130.762 · Dez/27 → R$79.788<br>
+            Mar/28 → R$53.480 · <strong>Mai/28 → R$ 0 ✅</strong><br><br>
+            Total juros pagos: <strong>R$ 85.861</strong><br>
+            Economia vs prazo original: <strong style="color:#2a7c4f">~R$ 308.027!</strong><br><br>
+            <strong>2° uso do FGTS:</strong> Mai/28 (~R$40.695 acumulados em 2 anos)
+          </div>
+        </div>
+
+        <div class="fin-card">
+          <div class="fin-title">🚗 Carro</div>
+          <div class="fin-sub">Itaú · Out/2025 · Sistema Price · 48x</div>
+          <div class="fin-row"><span class="lbl">Valor financiado</span><span>R$ 76.000</span></div>
+          <div class="fin-row"><span class="lbl">Saldo devedor</span><span class="red">R$ 73.614</span></div>
+          <div class="fin-row"><span class="lbl">Taxa efetiva</span><span class="red">28,77% a.a. ⚠️</span></div>
+          <div class="fin-row"><span class="lbl">CET</span><span class="red">32,26% a.a.</span></div>
+          <div class="fin-row"><span class="lbl">Parcelas pagas / restantes</span><span>6 / 42</span></div>
+          <div class="fin-row"><span class="lbl">🎯 Meta</span><span class="accent">Janeiro/2027</span></div>
+          <div class="fin-row"><span class="lbl">💰 Economia em juros</span><span class="green">~R$ 35.000</span></div>
+          <div class="prog-wrap">
+            <div class="prog-label"><span>Progresso</span><span>~3,5% quitado</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:3.5%;background:linear-gradient(90deg,#C1121F,#780000)"></div></div>
+          </div>
+          <div class="strat">
+            <strong>🎯 Plano de quitação — passo a passo:</strong><br><br>
+            <strong>Maio:</strong> parcela normal → R$ 2.617,60<br>
+            <strong>Junho:</strong> parcela + bônus → R$ 2.561,98 + <strong>R$ 20.000</strong> amortizados<br>
+            <strong>Jul → Jan/27:</strong> parcela + R$ 2.155/mês extra<br>
+            &nbsp;&nbsp;└ Evo*Kless liberado: R$ 1.600<br>
+            &nbsp;&nbsp;└ Aporte extra: R$ 555<br>
+            <strong>Setembro:</strong> + bônus <strong>R$ 5.000</strong><br>
+            <strong>Dezembro:</strong> + bônus R$ 5.000 + 13° <strong>R$ 15.200</strong><br><br>
+            <strong>Resultado mês a mês:</strong><br>
+            Mai/26 → R$ 72.543 · Jun/26 → R$ 51.504<br>
+            Jul/26 → R$ 48.267 · Ago/26 → R$ 45.014<br>
+            Set/26 → R$ 36.746 · Out/26 → R$ 33.353<br>
+            Nov/26 → R$ 29.939 · Dez/26 → R$ 6.301<br>
+            <strong>Jan/27 → R$ 0 ✅🎉</strong><br><br>
+            Total de juros pagos até jan/27: <strong>R$ 8.342</strong><br>
+            Economia vs pagar até dez/29: <strong style="color:#2a7c4f">~R$ 35.000!</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REEMBOLSOS -->
+    <div id="tab-reimb" class="tab-content">
+      <div style="margin-bottom:14px;font-size:13px;color:var(--muted);">Todo dia 1° do mês: 15min para submeter tudo. São <strong style="color:var(--green)">R$2.414/mês = R$28.968/ano</strong> que podem ir pro carro.</div>
+      <div class="reimb-grid">
+        <div class="reimb-card"><div class="reimb-title">🧠 Terapia</div><div class="reimb-val">R$ 1.515</div><div class="reimb-sub">Reembolso já recebido este mês. Dar entrada sempre que pagar a sessão.</div></div>
+        <div class="reimb-card"><div class="reimb-title">💊 Psiquiatra</div><div class="reimb-val">R$ 237</div><div class="reimb-sub">Plano reembolsa R$475/consulta (bimestral). ~R$237/mês em média.</div></div>
+        <div class="reimb-card"><div class="reimb-title">🩺 Endocrinologista</div><div class="reimb-val">R$ 475</div><div class="reimb-sub">Plano reembolsa R$475 da consulta de R$489,31. Dar entrada no app do plano.</div></div>
+        <div class="reimb-card"><div class="reimb-title">🚴 Cycle Club</div><div class="reimb-val">R$ 384</div><div class="reimb-sub">Empresa reembolsa 70% = R$384,30/mês. Submeter via RH mensalmente.</div></div>
+        <div class="reimb-card"><div class="reimb-title">📱 Vivo</div><div class="reimb-val">R$ 97</div><div class="reimb-sub">Empresa reembolsa — você ainda não está pedindo! Começa agora, são R$97/mês perdidos.</div></div>
+        <div class="reimb-card"><div class="reimb-title">🚕 Uber EUA</div><div class="reimb-val">~R$ 880</div><div class="reimb-sub">Reembolso na folha de maio (US$158,38). Já submetido ✅</div></div>
+        <div class="reimb-card"><div class="reimb-title">💻 Microsoft</div><div class="reimb-val">R$ 167</div><div class="reimb-sub">Pai reembolsa R$167,20/mês. Garantir transferência todo mês.</div></div>
+        <div class="reimb-card"><div class="reimb-title">📱 Trocafone (prima)</div><div class="reimb-val">R$ 283</div><div class="reimb-sub">Prima reembolsa R$283,25/mês. Parcela 4/12, encerra dez/26.</div></div>
+      </div>
+      <div class="alert-box ok" style="margin-top:16px;">
+        <div class="alert-icon">🗓️</div>
+        <div class="alert-text">Crie um lembrete recorrente: <strong>todo dia 1° do mês</strong>, 15 minutos dedicados a submeter todos os reembolsos de uma vez. Esse dinheiro, direcionado para amortizar o carro, é o que viabiliza a meta de jan/2027.</div>
+      </div>
+    </div>
+
+    <!-- PROJEÇÃO MAI-DEZ -->
+    <div id="tab-proj" class="tab-content">
+      <div style="margin-bottom:16px;font-size:13px;color:var(--muted);">Gastos <strong style="color:var(--text)">já comprometidos</strong> por mês — sem contar variáveis (restaurantes, compras, etc).</div>
+
+      <!-- summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;" id="proj-cards"></div>
+
+      <!-- legend -->
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px;font-size:12px;color:var(--muted);">
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#534AB7;display:inline-block"></span>gastos fixos</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75;display:inline-block"></span>parcelas</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#D85A30;display:inline-block"></span>saúde extra</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;border:1px dashed #888;display:inline-block"></span>renda</span>
+      </div>
+
+      <!-- chart -->
+      <div style="position:relative;width:100%;height:300px;margin-bottom:24px;">
+        <canvas id="projChart" role="img" aria-label="Gráfico de barras com projeção de gastos maio a dezembro 2026">Projeção de gastos comprometidos de maio a dezembro 2026.</canvas>
+      </div>
+
+      <!-- table -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr id="proj-thead"></tr>
+          </thead>
+          <tbody id="proj-tbody"></tbody>
+          <tfoot id="proj-tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- PLANO 2026 -->
+    <div id="tab-plano" class="tab-content">
+      <div class="card" style="padding:0 24px;">
+        <div class="timeline">
+          <div class="month-row"><div class="month-name cur">Abril 🟡</div><div class="month-tags"><span class="tag o">Painel completo ✅</span><span class="tag a">Pagar faturas com reserva</span><span class="tag i">Ativar reembolso Vivo urgente!</span></div><div class="month-val accent">Agora</div></div>
+          <div class="month-row"><div class="month-name">Maio</div><div class="month-tags"><span class="tag a">Itaú R$8.801 vence 07/mai</span><span class="tag a">Santander R$9.374 vence 05/mai</span><span class="tag o">Tokstok encerra ✅</span><span class="tag o">Uber EUA reembolso na folha</span><span class="tag i">Antecipar 2x Mounjaro NuPay</span></div><div class="month-val red">Pesado</div></div>
+          <div class="month-row"><div class="month-name">Junho</div><div class="month-tags"><span class="tag o">Marcenaria encerra ✅ -R$794</span><span class="tag o">Drogasil encerra ✅</span><span class="tag">Psiquiatra 💊</span></div><div class="month-val yellow">Aliviando</div></div>
+          <div class="month-row"><div class="month-name">Julho</div><div class="month-tags"><span class="tag o">Mounjaro NuPay encerra ✅</span><span class="tag o">Dom Pedro encerra ✅</span><span class="tag i">Amortizar carro com sobras!</span></div><div class="month-val green">Mais leve!</div></div>
+          <div class="month-row"><div class="month-name">Ago–Set</div><div class="month-tags"><span class="tag o">ML parcelas encerram</span><span class="tag">Psiquiatra set 💊</span><span class="tag i">Amortizar carro todo mês</span></div><div class="month-val green">Foco</div></div>
+          <div class="month-row"><div class="month-name">Out–Nov</div><div class="month-tags"><span class="tag">Psiquiatra nov 💊</span><span class="tag i">Amortizar carro</span><span class="tag a">Black Friday — definir teto!</span></div><div class="month-val">Atenção</div></div>
+          <div class="month-row"><div class="month-name">Dezembro</div><div class="month-tags"><span class="tag o">Trocafone encerra ✅</span><span class="tag a">13° → amortizar carro!</span><span class="tag i">Balanço 2026</span></div><div class="month-val accent">13°!</div></div>
+          <div class="month-row"><div class="month-name">Jan/2027 🏆</div><div class="month-tags"><span class="tag o">META: Quitar carro! 🎉</span><span class="tag i">Libera R$2.661/mês livre</span></div><div class="month-val green">Vitória!</div></div>
+        </div>
+      </div>
+      <div class="alert-box info" style="margin-top:16px;">
+        <div class="alert-icon">🏆</div>
+        <div class="alert-text"><strong>Quitar o carro em jan/2027 libera R$2.661/mês.</strong> Esse valor pode ir para amortizar a casa com FGTS, investimentos ou reserva de emergência. Após a quitação, sua saúde financeira muda completamente de patamar.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="max-width:960px;margin:40px auto 0;text-align:center;font-size:12px;color:var(--muted);padding-bottom:32px;">
+  Finance Planning & Tracking · Joyce & Henrique · Abril 2026
+</div>
+
+<script>
+function addItem(who) {
+  const container = document.getElementById(who + '-items');
+  const id = Date.now();
+  const div = document.createElement('div');
+  div.id = 'item-' + id;
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;';
+  div.innerHTML = `
+    <input type="text" placeholder="descrição" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;flex:1;" oninput="calcCasal()">
+    <span style="font-size:13px;color:var(--muted)">R$</span>
+    <input type="number" placeholder="0,00" step="0.01" min="0" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;width:100px;" oninput="calcCasal()">
+    <button onclick="removeItem('item-${id}')" style="background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;">×</button>
+  `;
+  container.appendChild(div);
+  calcCasal();
+}
+
+function removeItem(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  calcCasal();
+}
+
+function getExtras(who) {
+  const container = document.getElementById(who + '-items');
+  if (!container) return 0;
+  let total = 0;
+  container.querySelectorAll('input[type="number"]').forEach(inp => {
+    total += parseFloat(inp.value) || 0;
+  });
+  return total;
+}
+
+function calcFluxo() {
+  const fmt = v => 'R$ ' + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const saldoInicial = parseFloat(document.getElementById('fl-saldo').value) || 0;
+  const salario = parseFloat(document.getElementById('fl-salario').value) || 0;
+  const reimb   = parseFloat(document.getElementById('fl-reimb').value) || 0;
+  const c6      = parseFloat(document.getElementById('fl-c6').value) || 0;
+  const san     = parseFloat(document.getElementById('fl-san').value) || 0;
+  const itau    = parseFloat(document.getElementById('fl-itau').value) || 0;
+  const nu      = parseFloat(document.getElementById('fl-nu').value) || 0;
+  const cond    = parseFloat(document.getElementById('fl-cond').value) || 0;
+  const cpfl    = parseFloat(document.getElementById('fl-cpfl').value) || 0;
+
+  const itens = [
+    { dia: 1,  desc: 'Financiamento casa',       tipo: 'Moradia',    valor: 1325,    entrada: false },
+    { dia: 1,  desc: 'Financiamento carro',      tipo: 'Transporte', valor: 1325,    entrada: false },
+    { dia: 1,  desc: 'Seguro carro',             tipo: 'Transporte', valor: 175,     entrada: false },
+    { dia: 1,  desc: 'IPTU',                     tipo: 'Moradia',    valor: 57.50,   entrada: false },
+    { dia: 5,  desc: 'Fatura C6 (sua metade)',   tipo: 'Cartão',     valor: c6/2,    entrada: false },
+    { dia: 5,  desc: 'Fatura Santander',         tipo: 'Cartão',     valor: san,     entrada: false },
+    { dia: 7,  desc: 'Fatura Itaú',              tipo: 'Cartão',     valor: itau,    entrada: false },
+    { dia: 8,  desc: 'Fatura Nubank',            tipo: 'Cartão',     valor: nu,      entrada: false },
+    { dia: 10, desc: 'Condomínio (sua metade)',  tipo: 'Moradia',    valor: cond/2,  entrada: false },
+    { dia: 10, desc: 'CPFL (sua metade)',         tipo: 'Moradia',    valor: cpfl/2,  entrada: false },
+    { dia: 1,  desc: 'Salário 💚',               tipo: 'Entrada',    valor: salario, entrada: true  },
+    { dia: 1,  desc: 'Reembolsos 💚',            tipo: 'Entrada',    valor: reimb,   entrada: true  },
+  ].filter(i => i.valor > 0).sort((a,b) => a.dia - b.dia || (b.entrada ? 1 : -1));
+
+  const tbody = document.getElementById('fl-tbody');
+  tbody.innerHTML = '';
+
+  const trInit = document.createElement('tr');
+  trInit.style.background = 'rgba(200,240,76,0.04)';
+  trInit.innerHTML = `
+    <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;color:var(--muted)">—</td>
+    <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;font-weight:600">Saldo em conta</td>
+    <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc"><span style="background:rgba(200,240,76,0.1);color:var(--accent);border:1px solid rgba(200,240,76,0.3);padding:2px 8px;border-radius:100px;font-size:11px">Inicial</span></td>
+    <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent);font-weight:600">${fmt(saldoInicial)}</td>
+    <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--accent);font-weight:600">${fmt(saldoInicial)}</td>
+  `;
+  tbody.appendChild(trInit);
+
+  let saldo = saldoInicial;
+  let totalEntrada = saldoInicial;
+  let totalSaida = 0;
+
+  const badges = {
+    'Entrada':    'background:rgba(107,255,184,0.1);color:var(--green);border:1px solid rgba(107,255,184,0.3)',
+    'Cartão':     'background:rgba(192,132,252,0.1);color:var(--purple);border:1px solid rgba(192,132,252,0.3)',
+    'Moradia':    'background:rgba(76,250,240,0.1);color:var(--teal);border:1px solid rgba(76,250,240,0.3)',
+    'Transporte': 'background:rgba(240,196,76,0.1);color:var(--accent2);border:1px solid rgba(240,196,76,0.3)',
+  };
+
+  itens.forEach(item => {
+    if (item.entrada) { saldo += item.valor; totalEntrada += item.valor; }
+    else              { saldo -= item.valor; totalSaida  += item.valor; }
+    const saldoColor = saldo >= 0 ? 'var(--green)' : 'var(--red)';
+    const valorColor = item.entrada ? 'var(--green)' : 'var(--red)';
+    const sinal = item.entrada ? '+' : '-';
+    const badge = badges[item.tipo] || 'background:rgba(136,136,136,0.1);color:var(--muted);border:1px solid rgba(136,136,136,0.3)';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;color:var(--muted);white-space:nowrap">dia ${item.dia}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc">${item.desc}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc"><span style="${badge};padding:2px 8px;border-radius:100px;font-size:11px">${item.tipo}</span></td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;color:${valorColor};font-weight:500">${sinal} ${fmt(item.valor)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e3dc;text-align:right;font-weight:600;color:${saldoColor}">${saldo < 0 ? '-' : ''}${fmt(saldo)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('fl-total-entrada').textContent = fmt(totalEntrada);
+  document.getElementById('fl-total-saida').textContent = fmt(totalSaida);
+  const sf = document.getElementById('fl-saldo-final');
+  sf.textContent = (saldo < 0 ? '-' : '') + fmt(saldo);
+  sf.style.color = saldo >= 0 ? 'var(--accent)' : 'var(--red)';
+}
+
+function calcCasal() {
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const cond = parseFloat(document.getElementById('inp-cond').value) || 0;
+  const cpfl = parseFloat(document.getElementById('inp-cpfl').value) || 0;
+  const c6 = parseFloat(document.getElementById('inp-c6').value) || 0;
+  const joyExtra = getExtras('joyce');
+  const henExtra = getExtras('henrique');
+
+  // variáveis condomínio, cpfl, c6
+  document.getElementById('tot-cond').textContent = fmt(cond);
+  document.getElementById('joy-cond').textContent = fmt(cond/2);
+  document.getElementById('mar-cond').textContent = fmt(cond/2);
+  document.getElementById('tot-cpfl').textContent = fmt(cpfl);
+  document.getElementById('joy-cpfl').textContent = fmt(cpfl/2);
+  document.getElementById('mar-cpfl').textContent = fmt(cpfl/2);
+  document.getElementById('tot-c6').textContent = fmt(c6);
+  document.getElementById('joy-c6').textContent = fmt(c6/2);
+  document.getElementById('mar-c6').textContent = fmt(c6/2);
+
+  // extras Joyce: Joyce pagou tudo, Henrique deve metade
+  const rowJoy = document.getElementById('row-joy-extra');
+  if (joyExtra > 0) {
+    rowJoy.style.display = '';
+    document.getElementById('tot-joy-extra').textContent = fmt(joyExtra);
+    document.getElementById('joy-joy-extra').textContent = fmt(joyExtra/2);
+    document.getElementById('mar-joy-extra').textContent = fmt(joyExtra/2);
+  } else { rowJoy.style.display = 'none'; }
+
+  // extras Henrique: Henrique pagou tudo, Joyce deve metade
+  const rowHen = document.getElementById('row-hen-extra');
+  if (henExtra > 0) {
+    rowHen.style.display = '';
+    document.getElementById('tot-hen-extra').textContent = fmt(henExtra);
+    document.getElementById('joy-hen-extra').textContent = fmt(henExtra/2);
+    document.getElementById('mar-hen-extra').textContent = fmt(henExtra/2);
+  } else { rowHen.style.display = 'none'; }
+
+  // totais
+  const fixos = 2650 + 2650 + 350 + 115;
+  const totalGeral = fixos + cond + cpfl + c6 + joyExtra + henExtra;
+  const joyPagou = fixos/2 + cond/2 + cpfl/2 + c6/2 + joyExtra;
+  const henPagou = fixos/2 + cond/2 + cpfl/2 + c6/2 + henExtra;
+  const metade = totalGeral / 2;
+
+  document.getElementById('tot-total').textContent = fmt(totalGeral);
+  document.getElementById('joy-total').textContent = fmt(metade);
+  document.getElementById('mar-total').textContent = fmt(metade);
+
+  // quanto Henrique transfere para Joyce
+  // Joyce pagou: fixos÷2 + variáveis÷2 + joyExtra
+  // Henrique deve pagar: metade do total
+  // Henrique já pagou: fixos÷2 + variáveis÷2 + henExtra
+  // Saldo: metade - henPagou = quanto Henrique precisa transferir
+  const transferencia = metade - henPagou;
+  const el = document.getElementById('transferencia');
+  const label = document.getElementById('transferencia-label');
+  if (transferencia >= 0) {
+    el.textContent = fmt(transferencia);
+    el.style.color = 'var(--accent)';
+    if (label) label.textContent = 'Henrique transfere para Joyce';
+  } else {
+    el.textContent = fmt(Math.abs(transferencia));
+    el.style.color = 'var(--pink)';
+    if (label) label.textContent = 'Joyce transfere para Henrique';
+  }
+}
+
+function filterTable(card) {
+  const sel = document.getElementById('filter-' + card);
+  const cat = sel.value;
+  const subtab = document.getElementById('subtab-' + card);
+  const rows = subtab.querySelectorAll('tbody tr[data-cat]');
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  let total = 0;
+  rows.forEach(row => {
+    const rowCat = row.getAttribute('data-cat');
+    const show = cat === 'all' || rowCat === cat;
+    row.style.display = show ? '' : 'none';
+    if (show) {
+      const tds = row.querySelectorAll('td');
+      // find the td with text-align:right that contains R$
+      let val = NaN;
+      for (let i = 0; i < tds.length; i++) {
+        const td = tds[i];
+        if (td.style.textAlign === 'right' && td.textContent.includes('R$')) {
+          const parsed = parseFloat(td.textContent.replace('R$','').replace(/\./g,'').replace(',','.').trim());
+          if (!isNaN(parsed)) val = parsed;
+        }
+      }
+      if (!isNaN(val)) total += val;
+    }
+  });
+
+  const sumEl = document.getElementById('filter-' + card + '-sum');
+  if (cat !== 'all') {
+    sumEl.textContent = '→ Total filtrado: ' + fmt(total);
+  } else {
+    sumEl.textContent = '';
+  }
+}
+
+function showSubTab(name, el) {
+  document.querySelectorAll('#tab-cartoes [id^="subtab-"]').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('#tab-cartoes .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('subtab-' + name).style.display = 'block';
+  el.classList.add('active');
+}
+
+async function carregarCartoes() {
+  const mes = document.getElementById('mes-global').value;
+  const cartoes = ['C6','Santander','Itaú','Nubank'];
+  const ids = {'C6':'c6','Santander':'san','Itaú':'itau','Nubank':'nu'};
+  const vencimentos = {'C6':'dia 5','Santander':'dia 5','Itaú':'dia 7','Nubank':'dia 8'};
+
+  const catColors = {
+    'Casa':'#003049','Alimentação':'#780000','Restaurantes':'#C1121F',
+    'Saúde':'#9333ea','Gastos Pessoais':'#669BBC','Assinatura':'#888',
+    'Transporte':'#b45309','Família':'#C1121F','Pet':'#2a7c4f',
+    'Viagem':'#0369a1','Outros':'#888'
+  };
+
+  try {
+    const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+    const rows = await res.json();
+    if (!rows || rows.length <= 1) return;
+
+    // Filter by month
+    let data = rows.slice(1).filter(r => r[0] && String(r[0]).substring(0,7) === mes);
+
+    cartoes.forEach(cartao => {
+      const id = ids[cartao];
+      const el = document.getElementById('cartao-' + id + '-content');
+      const items = data.filter(r => r[3] === cartao);
+
+      if (items.length === 0) {
+        el.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted)">Nenhum lançamento para ${cartao} em ${mes}.</div>`;
+        return;
+      }
+
+      // Group by category
+      const porCat = {};
+      let total = 0;
+      items.forEach(r => {
+        const v = parseFloat(r[2]) || 0;
+        total += v;
+        const cat = r[4] || 'Outros';
+        porCat[cat] = (porCat[cat] || 0) + v;
+      });
+
+      const fmt = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+      // Filter bar
+      const catOpts = Object.keys(porCat).sort();
+      let html = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <label style="font-size:12px;color:var(--muted);">Filtrar por categoria:</label>
+        <select id="filter-dyn-${id}" onchange="filterDyn('${id}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:13px;">
+          <option value="all">Todas</option>
+          ${catOpts.map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+        <span id="filter-dyn-${id}-sum" style="font-size:13px;color:#C1121F;font-weight:600;"></span>
+      </div>`;
+
+      // Summary cards
+      html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="sum-card"><div class="sum-label">Total fatura</div><div class="sum-val red">${fmt(total)}</div><div class="sum-sub">vence ${vencimentos[cartao]}</div></div>
+        <div class="sum-card"><div class="sum-label">Lançamentos</div><div class="sum-val" style="color:#003049">${items.length}</div></div>
+      </div>`;
+
+      // Category summary pills
+      html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">';
+      Object.entries(porCat).sort((a,b)=>b[1]-a[1]).forEach(([cat,val]) => {
+        const cor = catColors[cat] || '#888';
+        html += `<div style="background:${cor}15;border:1px solid ${cor}40;border-radius:100px;padding:4px 12px;font-size:12px;">
+          <span style="color:${cor};font-weight:500">${cat}</span>
+          <span style="color:var(--muted);margin-left:6px">${fmt(val)}</span>
+        </div>`;
+      });
+      html += '</div>';
+
+      // Table
+      html += `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;" id="table-dyn-${id}">
+        <thead><tr>
+          <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Data</th>
+          <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Descrição</th>
+          <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Categoria</th>
+          <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Valor</th>
+          <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border)">Obs</th>
+        </tr></thead><tbody>`;
+
+      items.sort((a,b) => new Date(b[0])-new Date(a[0])).forEach(r => {
+        const [dt,desc,valor,cart,cat,obs] = r;
+        const v = parseFloat(valor)||0;
+        const cor = catColors[cat]||'#888';
+        const dtFmt = dt ? new Date(dt).toLocaleDateString('pt-BR',{timeZone:'UTC'}) : dt;
+        html += `<tr data-cat="${cat}">
+          <td style="padding:9px 12px;border-bottom:1px solid #e5e3dc;color:var(--muted);white-space:nowrap">${dtFmt}</td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e5e3dc">${desc}</td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e5e3dc"><span style="background:${cor}18;color:${cor};border:1px solid ${cor}40;padding:2px 8px;border-radius:100px;font-size:11px">${cat}</span></td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e5e3dc;text-align:right;font-weight:500">${fmt(v)}</td>
+          <td style="padding:9px 12px;border-bottom:1px solid #e5e3dc;font-size:11px;color:var(--muted)">${obs||''}</td>
+        </tr>`;
+      });
+
+      html += `</tbody><tfoot><tr>
+        <td colspan="3" style="padding:10px 12px;border-top:1px solid var(--border);font-weight:600;font-size:13px;background:var(--surface2)">Total ${cartao}</td>
+        <td style="padding:10px 12px;border-top:1px solid var(--border);text-align:right;font-weight:600;font-size:13px;background:var(--surface2);color:#C1121F">${fmt(total)}</td>
+        <td style="padding:10px 12px;border-top:1px solid var(--border);background:var(--surface2)"></td>
+      </tr></tfoot></table></div>`;
+
+      el.innerHTML = html;
+    });
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+function filterDyn(id) {
+  const sel = document.getElementById('filter-dyn-' + id);
+  const cat = sel.value;
+  const table = document.getElementById('table-dyn-' + id);
+  const sumEl = document.getElementById('filter-dyn-' + id + '-sum');
+  if (!table) return;
+
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  let total = 0;
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const show = cat === 'all' || tr.getAttribute('data-cat') === cat;
+    tr.style.display = show ? '' : 'none';
+    if (show) {
+      const tds = tr.querySelectorAll('td');
+      tds.forEach(td => {
+        if (td.style.textAlign === 'right' && td.textContent.includes('R$')) {
+          const v = parseFloat(td.textContent.replace('R$','').replace(/\./g,'').replace(',','.').trim());
+          if (!isNaN(v)) total += v;
+        }
+      });
+    }
+  });
+  sumEl.textContent = cat !== 'all' ? '→ Total: ' + fmt(total) : '';
+}
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyIgrnOtTMnbdFZ3xkjFMXJ609pfZrL5j1iqrkbBVvHDzMVKCvEWoJ9BYXB-4DKEhTVTQ/exec';
+
+function mudarMes() {
+  const mes = document.getElementById('mes-global').value;
+
+  // Sync filtro-mes in Input/Registros tab
+  const filtroMes = document.getElementById('filtro-mes');
+  if (filtroMes) {
+    filtroMes.value = mes;
+    // Auto-reload if registros tab is active
+    if (document.getElementById('tab-registros').classList.contains('active')) {
+      carregarGastos();
+    }
+    // Auto-reload if cartoes tab is active
+    if (document.getElementById('tab-cartoes').classList.contains('active')) {
+      carregarCartoes();
+    }
+  }
+
+  // Sync fluxo de caixa mes selector if exists
+  const flMes = document.getElementById('fl-mes');
+  if (flMes) flMes.value = parseInt(mes.split('-')[1]).toString();
+
+  // Update footer reference
+  const footer = document.querySelector('[data-mes-footer]');
+  if (footer) {
+    const [ano, m] = mes.split('-');
+    const nomes = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    footer.textContent = `${nomes[parseInt(m)]} ${ano}`;
+  }
+}
+
+// Set today's date as default
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  const input = document.getElementById('ng-data');
+  if (input) input.value = today;
+
+  // Sync filtro-mes with mes-global on load
+  const mesGlobal = document.getElementById('mes-global');
+  const filtroMes = document.getElementById('filtro-mes');
+  if (mesGlobal && filtroMes) filtroMes.value = mesGlobal.value;
+});
+
+async function salvarGasto() {
+  const data     = document.getElementById('ng-data').value;
+  const descricao = document.getElementById('ng-desc').value.trim();
+  const valor    = document.getElementById('ng-valor').value;
+  const cartao   = document.getElementById('ng-cartao').value;
+  const categoria = document.getElementById('ng-cat').value;
+  const observacao = document.getElementById('ng-obs').value.trim();
+  const status   = document.getElementById('ng-status');
+
+  if (!data || !descricao || !valor || !cartao || !categoria) {
+    status.textContent = '⚠️ Preencha todos os campos obrigatórios';
+    status.style.color = '#C1121F';
+    return;
+  }
+
+  status.textContent = '⏳ Salvando...';
+  status.style.color = 'var(--muted)';
+
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data, descricao, valor: parseFloat(valor), cartao, categoria, observacao })
+    });
+    status.textContent = '✅ Gasto salvo!';
+    status.style.color = '#2a7c4f';
+    limparForm();
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  } catch (err) {
+    status.textContent = '❌ Erro ao salvar. Tente novamente.';
+    status.style.color = '#C1121F';
+  }
+}
+
+function limparForm() {
+  document.getElementById('ng-desc').value = '';
+  document.getElementById('ng-valor').value = '';
+  document.getElementById('ng-cartao').value = '';
+  document.getElementById('ng-cat').value = '';
+  document.getElementById('ng-obs').value = '';
+}
+
+async function carregarGastos() {
+  const lista = document.getElementById('gastos-lista');
+  const totalDiv = document.getElementById('gastos-total');
+  const totalVal = document.getElementById('gastos-total-val');
+  const filtroMes = document.getElementById('filtro-mes').value;
+  const filtroCat = document.getElementById('filtro-cat').value;
+
+  lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ Carregando...</div>';
+
+  try {
+    const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+    const rows = await res.json();
+
+    if (!rows || rows.length <= 1) {
+      lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Nenhum gasto registrado ainda.</div>';
+      return;
+    }
+
+    let data = rows.slice(1);
+
+    // Filter by month
+    if (filtroMes) {
+      data = data.filter(r => {
+        const d = r[0] ? String(r[0]).substring(0, 7) : '';
+        return d === filtroMes;
+      });
+    }
+
+    // Filter by category
+    if (filtroCat) data = data.filter(r => r[4] === filtroCat);
+
+    if (data.length === 0) {
+      lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Nenhum gasto encontrado para esse filtro.</div>';
+      totalDiv.style.display = 'none';
+      return;
+    }
+
+    // Sort by date desc
+    data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
+    const catColors = {
+      'Casa': '#003049', 'Alimentação': '#780000', 'Restaurantes': '#C1121F',
+      'Saúde': '#c084fc', 'Gastos Pessoais': '#669BBC', 'Assinatura': '#888',
+      'Transporte': '#f0c44c', 'Família': '#C1121F', 'Pet': '#2a7c4f',
+      'Viagem': '#C1121F', 'Outros': '#888'
+    };
+
+    // Group by category for summary
+    const porCat = {};
+    let total = 0;
+    data.forEach(row => {
+      const v = parseFloat(row[2]) || 0;
+      total += v;
+      const cat = row[4] || 'Outros';
+      porCat[cat] = (porCat[cat] || 0) + v;
+    });
+
+    // Summary pills
+    let summaryHtml = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">';
+    Object.entries(porCat).sort((a,b)=>b[1]-a[1]).forEach(([cat, val]) => {
+      const cor = catColors[cat] || '#888';
+      summaryHtml += `<div style="background:${cor}15;border:1px solid ${cor}40;border-radius:100px;padding:4px 12px;font-size:12px;">
+        <span style="color:${cor};font-weight:500">${cat}</span>
+        <span style="color:var(--muted);margin-left:6px">R$ ${val.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+      </div>`;
+    });
+    summaryHtml += '</div>';
+
+    let html = summaryHtml;
+    html += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+    html += '<thead><tr>';
+    html += '<th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border)">Data</th>';
+    html += '<th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border)">Descrição</th>';
+    html += '<th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border)">Cartão</th>';
+    html += '<th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border)">Categoria</th>';
+    html += '<th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid var(--border)">Valor</th>';
+    html += '</tr></thead><tbody>';
+
+    data.forEach(row => {
+      const [dt, desc, valor, cartao, cat, obs] = row;
+      const v = parseFloat(valor) || 0;
+      const cor = catColors[cat] || '#888';
+      const dtObj = dt ? new Date(dt) : null;
+      const dataFmt = dtObj ? dtObj.toLocaleDateString('pt-BR', {timeZone:'UTC'}) : dt;
+      html += `<tr>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;white-space:nowrap;color:var(--muted)">${dataFmt}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc">${desc}${obs ? `<br><span style="font-size:11px;color:var(--muted)">${obs}</span>` : ''}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;color:var(--muted)">${cartao}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc"><span style="background:${cor}18;color:${cor};border:1px solid ${cor}40;padding:2px 8px;border-radius:100px;font-size:11px">${cat}</span></td>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;text-align:right;font-weight:500">R$ ${v.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      </tr>`;
+    });
+
+    html += '</tbody></table>';
+    lista.innerHTML = html;
+    totalDiv.style.display = 'flex';
+    totalVal.textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2});
+
+  } catch (err) {
+    lista.innerHTML = '<div style="text-align:center;padding:20px;color:#C1121F">❌ Erro ao carregar. Verifique a conexão.</div>';
+  }
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'proj' && !window.projBuilt) buildProj();
+  if (name === 'casal') calcCasal();
+  if (name === 'fluxo') calcFluxo();
+  if (name === 'registros') {
+    // Sync filtro-mes with global selector then load
+    const mes = document.getElementById('mes-global');
+    const filtroMes = document.getElementById('filtro-mes');
+    if (mes && filtroMes) filtroMes.value = mes.value;
+    carregarGastos();
+  }
+  if (name === 'cartoes') carregarCartoes();
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+window.projBuilt = false;
+function buildProj() {
+  window.projBuilt = true;
+  const renda = 15200;
+  const meses = ['Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const linhas = [
+    { nome: 'Gastos fixos recorrentes', nota: 'casa, saúde, carro, assinaturas, remédios', cat: 'fixo', vals: [7769,7769,7769,7769,7769,7769,7769,7769] },
+    { nome: 'Mounjaro', nota: 'até out/26', cat: 'saude', vals: [1800,1800,1800,1800,1800,1800,0,0] },
+    { nome: 'Mounjaro NuPay (antecipação)', nota: 'parcelas 2/3 + 3/3', cat: 'saude', vals: [1186.30,0,0,0,0,0,0,0] },
+    { nome: 'Psiquiatra', nota: 'jun–nov (R$785,70÷2/mês)', cat: 'saude', vals: [0,392.85,392.85,392.85,392.85,392.85,392.85,0] },
+    { nome: 'Marcenaria Evo*Kless (C6÷2)', nota: 'última jun/26', cat: 'parcela', vals: [794.45,794.45,0,0,0,0,0,0] },
+    { nome: 'Geladeira ML (C6÷2)', nota: 'até out/26', cat: 'parcela', vals: [156.37,156.37,156.37,156.37,156.37,0,0,0] },
+    { nome: 'ML parcelas (C6÷2)', nota: 'até ago/26', cat: 'parcela', vals: [84.21,84.21,84.21,84.21,0,0,0,0] },
+    { nome: 'Amazon Marketplace (C6÷2)', nota: 'até out/26', cat: 'parcela', vals: [25.11,25.11,25.11,25.11,25.11,25.11,0,0] },
+  ];
+
+  const fmt = v => v === 0 ? '<span style="color:var(--muted)">—</span>' : 'R$\u00a0' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const totais = meses.map((_,i) => linhas.reduce((s,l) => s+l.vals[i], 0));
+  const sobras = totais.map(t => renda - t);
+
+  const thead = document.getElementById('proj-thead');
+  thead.innerHTML = '<th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border)">Item</th>' +
+    meses.map(m => `<th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--border)">${m}</th>`).join('');
+
+  const tbody = document.getElementById('proj-tbody');
+  linhas.forEach(l => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;font-size:13px">${l.nome} <span style="font-size:11px;color:var(--muted)">${l.nota}</span></td>` +
+      l.vals.map(v => `<td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;text-align:right;font-size:13px">${fmt(v)}</td>`).join('');
+    tbody.appendChild(tr);
+  });
+
+  const tfoot = document.getElementById('proj-tfoot');
+  const trT = document.createElement('tr');
+  trT.innerHTML = `<td style="padding:10px;border-top:1px solid var(--border);font-weight:600;font-size:13px;background:var(--surface2)">Total comprometido</td>` +
+    totais.map(t => `<td style="padding:10px;border-top:1px solid var(--border);text-align:right;font-weight:600;font-size:13px;background:var(--surface2)">R$\u00a0${Math.round(t).toLocaleString('pt-BR')}</td>`).join('');
+  tfoot.appendChild(trT);
+
+  const trS = document.createElement('tr');
+  trS.innerHTML = `<td style="padding:10px;font-weight:600;font-size:13px">Sobra para variáveis</td>` +
+    sobras.map(s => `<td style="padding:10px;text-align:right;font-weight:600;font-size:13px;color:${s>4000?'var(--green)':s>2500?'var(--accent2)':'var(--red)'}">${s<0?'-':''}R$\u00a0${Math.abs(Math.round(s)).toLocaleString('pt-BR')}</td>`).join('');
+  tfoot.appendChild(trS);
+
+  const melhorIdx = sobras.indexOf(Math.max(...sobras));
+  const piorIdx = sobras.indexOf(Math.min(...sobras));
+  const media = Math.round(totais.reduce((a,b)=>a+b,0)/8);
+  document.getElementById('proj-cards').innerHTML = `
+    <div class="sum-card"><div class="sum-label">renda mensal</div><div class="sum-val accent">R$ 15.200</div></div>
+    <div class="sum-card"><div class="sum-label">média comprometida</div><div class="sum-val red">R$ ${media.toLocaleString('pt-BR')}</div></div>
+    <div class="sum-card"><div class="sum-label">melhor mês (${meses[melhorIdx]})</div><div class="sum-val green">R$ ${Math.round(sobras[melhorIdx]).toLocaleString('pt-BR')}</div><div class="sum-sub">sobra para variáveis</div></div>
+    <div class="sum-card"><div class="sum-label">mês mais pesado (${meses[piorIdx]})</div><div class="sum-val red">R$ ${Math.round(totais[piorIdx]).toLocaleString('pt-BR')}</div><div class="sum-sub">comprometido</div></div>
+  `;
+
+  const fixos = meses.map((_,i) => linhas.filter(l=>l.cat==='fixo').reduce((s,l)=>s+l.vals[i],0));
+  const parcelas = meses.map((_,i) => linhas.filter(l=>l.cat==='parcela').reduce((s,l)=>s+l.vals[i],0));
+  const saude = meses.map((_,i) => linhas.filter(l=>l.cat==='saude').reduce((s,l)=>s+l.vals[i],0));
+
+  new Chart(document.getElementById('projChart'), {
+    type: 'bar',
+    data: {
+      labels: meses,
+      datasets: [
+        { label: 'Gastos fixos', data: fixos, backgroundColor: '#534AB7', stack: 'a' },
+        { label: 'Parcelas', data: parcelas, backgroundColor: '#1D9E75', stack: 'a' },
+        { label: 'Saúde extra', data: saude, backgroundColor: '#D85A30', stack: 'a' },
+        { label: 'Renda', data: meses.map(()=>renda), type: 'line', borderColor: '#888', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { autoSkip: false } },
+        y: { beginAtZero: true, max: 18000, ticks: { callback: v => 'R$'+(v/1000).toFixed(0)+'k' }, grid: { color: 'rgba(200,200,200,0.1)' } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
