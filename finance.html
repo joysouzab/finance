@@ -132,9 +132,6 @@
     <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
       <label style="font-size:12px;color:var(--muted);">Mês:</label>
       <select id="mes-global" onchange="mudarMes()" style="background:white;border:1px solid var(--border);border-radius:8px;padding:6px 14px;color:#003049;font-size:13px;font-weight:600;cursor:pointer;">
-        <option value="2026-01">Janeiro 2026</option>
-        <option value="2026-02">Fevereiro 2026</option>
-        <option value="2026-03">Março 2026</option>
         <option value="2026-04">Abril 2026</option>
         <option value="2026-05" selected>Maio 2026</option>
         <option value="2026-06">Junho 2026</option>
@@ -171,7 +168,6 @@
       <button class="tab" onclick="showTab('fin',this)">🏠 Financiamentos</button>
       <button class="tab" onclick="showTab('reimb',this)">💚 Reembolsos</button>
       <button class="tab" onclick="showTab('proj',this)">📈 Projeção mai–dez</button>
-      <button class="tab" onclick="showTab('plano',this)">🎯 Plano 2026</button>
     </div>
 
     <!-- CONTROLE -->
@@ -402,9 +398,6 @@
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <select id="filtro-mes" onchange="carregarGastos()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:12px;">
               <option value="">Todos os meses</option>
-              <option value="2026-01">Jan/26</option>
-              <option value="2026-02">Fev/26</option>
-              <option value="2026-03">Mar/26</option>
               <option value="2026-04">Abr/26</option>
               <option value="2026-05" selected>Mai/26</option>
               <option value="2026-06">Jun/26</option>
@@ -746,18 +739,146 @@
 
     <!-- REEMBOLSOS -->
     <div id="tab-reimb" class="tab-content">
-      <div style="margin-bottom:14px;font-size:13px;color:var(--muted);">Todo dia 1° do mês: 15min para submeter tudo. São <strong style="color:var(--green)">R$2.414/mês = R$28.968/ano</strong> que podem ir pro carro.</div>
-      <div class="reimb-grid">
-        <div class="reimb-card"><div class="reimb-title">🧠 Terapia</div><div class="reimb-val">R$ 1.515</div><div class="reimb-sub">Reembolso já recebido este mês. Dar entrada sempre que pagar a sessão.</div></div>
-        <div class="reimb-card"><div class="reimb-title">💊 Psiquiatra</div><div class="reimb-val">R$ 237</div><div class="reimb-sub">Plano reembolsa R$475/consulta (bimestral). ~R$237/mês em média.</div></div>
-        <div class="reimb-card"><div class="reimb-title">🩺 Endocrinologista</div><div class="reimb-val">R$ 475</div><div class="reimb-sub">Plano reembolsa R$475 da consulta de R$489,31. Dar entrada no app do plano.</div></div>
-        <div class="reimb-card"><div class="reimb-title">🚴 Cycle Club</div><div class="reimb-val">R$ 384</div><div class="reimb-sub">Empresa reembolsa 70% = R$384,30/mês. Submeter via RH mensalmente.</div></div>
-        <div class="reimb-card"><div class="reimb-title">📱 Vivo</div><div class="reimb-val">R$ 97</div><div class="reimb-sub">Empresa reembolsa — você ainda não está pedindo! Começa agora, são R$97/mês perdidos.</div></div>
-        <div class="reimb-card"><div class="reimb-title">🚕 Uber EUA</div><div class="reimb-val">~R$ 880</div><div class="reimb-sub">Reembolso na folha de maio (US$158,38). Já submetido ✅</div></div>
-        <div class="reimb-card"><div class="reimb-title">💻 Microsoft</div><div class="reimb-val">R$ 167</div><div class="reimb-sub">Pai reembolsa R$167,20/mês. Garantir transferência todo mês.</div></div>
-        <div class="reimb-card"><div class="reimb-title">📱 Trocafone (prima)</div><div class="reimb-val">R$ 283</div><div class="reimb-sub">Prima reembolsa R$283,25/mês. Parcela 4/12, encerra dez/26.</div></div>
+      <div style="margin-bottom:18px;font-size:13px;color:var(--muted);">Registre o valor <strong style="color:var(--text)">realmente recebido</strong> este mês em cada reembolso. O total alimenta automaticamente o campo de Reembolsos no Fluxo de Caixa.</div>
+
+      <!-- table -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:10px 16px;border-bottom:1px solid var(--border);">Origem</th>
+              <th style="text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:10px 16px;border-bottom:1px solid var(--border);">Nota</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;">Esperado</th>
+              <th style="text-align:right;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;">Recebido este mês</th>
+            </tr>
+          </thead>
+          <tbody id="reimb-tbody">
+            <tr data-esperado="1515">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">🧠 Terapia</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Plano de saúde — dar entrada sempre que pagar a sessão</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 1.515</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="237">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">💊 Psiquiatra</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Plano reembolsa R$475/consulta (bimestral) · ~R$237/mês em média</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 237</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="475">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">🩺 Endocrinologista</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Plano reembolsa R$475 da consulta de R$489,31 · dar entrada no app</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 475</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="384">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">🚴 Cycle Club</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Empresa reembolsa 70% = R$384,30/mês · submeter via RH</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 384</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="97">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">📱 Vivo</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Empresa reembolsa · submeter via RH mensalmente</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 97</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="0">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">🚕 Uber / Viagem</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Reembolso empresa por despesas de viagem · varia por mês</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">variável</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="167">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">💻 Microsoft</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Pai reembolsa R$167,20/mês · garantir transferência todo mês</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 167</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+            <tr data-esperado="283">
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;font-weight:600;">📱 Trocafone (prima)</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;color:var(--muted);">Prima reembolsa R$283,25/mês · parcela 4/12, encerra dez/26</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;color:var(--muted);">R$ 283</td>
+              <td style="padding:12px 16px;border-bottom:1px solid #e5e3dc;text-align:right;">
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+                  <span style="font-size:12px;color:var(--muted)">R$</span>
+                  <input type="number" class="reimb-input" step="0.01" min="0" placeholder="0,00" oninput="calcReimb()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:13px;width:110px;text-align:right;">
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="padding:14px 16px;background:var(--surface2);font-weight:600;font-size:13px;">Total recebido este mês</td>
+              <td style="padding:14px 16px;background:var(--surface2);text-align:right;color:var(--muted);font-size:13px;" id="reimb-total-esperado">R$ 2.163</td>
+              <td style="padding:14px 16px;background:var(--surface2);text-align:right;">
+                <span style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--green);" id="reimb-total-val">R$ 0,00</span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
-      <div class="alert-box ok" style="margin-top:16px;">
+
+      <!-- summary cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px;">
+        <div style="background:rgba(42,124,79,0.07);border:1px solid rgba(42,124,79,0.25);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Recebido</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--green);" id="reimb-card-recebido">R$ 0,00</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">este mês</div>
+        </div>
+        <div style="background:rgba(0,48,73,0.05);border:1px solid rgba(0,48,73,0.2);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Esperado</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#003049;" id="reimb-card-esperado">R$ 2.163</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">+ variável viagem</div>
+        </div>
+        <div style="background:rgba(193,18,31,0.06);border:1px solid rgba(193,18,31,0.2);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Ainda a receber</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;" id="reimb-card-falta" style="color:#C1121F;">R$ 2.163</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">dos fixos</div>
+        </div>
+        <div style="background:rgba(102,155,188,0.08);border:1px solid rgba(102,155,188,0.3);border-radius:var(--radius);padding:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Fluxo de Caixa</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#669BBC;" id="reimb-card-fluxo">sincronizado ✓</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">atualizado automaticamente</div>
+        </div>
+      </div>
+
+      <div class="alert-box ok">
         <div class="alert-icon">🗓️</div>
         <div class="alert-text">Crie um lembrete recorrente: <strong>todo dia 1° do mês</strong>, 15 minutos dedicados a submeter todos os reembolsos de uma vez. Esse dinheiro, direcionado para amortizar o carro, é o que viabiliza a meta de jan/2027.</div>
       </div>
@@ -795,25 +916,6 @@
       </div>
     </div>
 
-    <!-- PLANO 2026 -->
-    <div id="tab-plano" class="tab-content">
-      <div class="card" style="padding:0 24px;">
-        <div class="timeline">
-          <div class="month-row"><div class="month-name cur">Abril 🟡</div><div class="month-tags"><span class="tag o">Painel completo ✅</span><span class="tag a">Pagar faturas com reserva</span><span class="tag i">Ativar reembolso Vivo urgente!</span></div><div class="month-val accent">Agora</div></div>
-          <div class="month-row"><div class="month-name">Maio</div><div class="month-tags"><span class="tag a">Itaú R$8.801 vence 07/mai</span><span class="tag a">Santander R$9.374 vence 05/mai</span><span class="tag o">Tokstok encerra ✅</span><span class="tag o">Uber EUA reembolso na folha</span><span class="tag i">Antecipar 2x Mounjaro NuPay</span></div><div class="month-val red">Pesado</div></div>
-          <div class="month-row"><div class="month-name">Junho</div><div class="month-tags"><span class="tag o">Marcenaria encerra ✅ -R$794</span><span class="tag o">Drogasil encerra ✅</span><span class="tag">Psiquiatra 💊</span></div><div class="month-val yellow">Aliviando</div></div>
-          <div class="month-row"><div class="month-name">Julho</div><div class="month-tags"><span class="tag o">Mounjaro NuPay encerra ✅</span><span class="tag o">Dom Pedro encerra ✅</span><span class="tag i">Amortizar carro com sobras!</span></div><div class="month-val green">Mais leve!</div></div>
-          <div class="month-row"><div class="month-name">Ago–Set</div><div class="month-tags"><span class="tag o">ML parcelas encerram</span><span class="tag">Psiquiatra set 💊</span><span class="tag i">Amortizar carro todo mês</span></div><div class="month-val green">Foco</div></div>
-          <div class="month-row"><div class="month-name">Out–Nov</div><div class="month-tags"><span class="tag">Psiquiatra nov 💊</span><span class="tag i">Amortizar carro</span><span class="tag a">Black Friday — definir teto!</span></div><div class="month-val">Atenção</div></div>
-          <div class="month-row"><div class="month-name">Dezembro</div><div class="month-tags"><span class="tag o">Trocafone encerra ✅</span><span class="tag a">13° → amortizar carro!</span><span class="tag i">Balanço 2026</span></div><div class="month-val accent">13°!</div></div>
-          <div class="month-row"><div class="month-name">Jan/2027 🏆</div><div class="month-tags"><span class="tag o">META: Quitar carro! 🎉</span><span class="tag i">Libera R$2.661/mês livre</span></div><div class="month-val green">Vitória!</div></div>
-        </div>
-      </div>
-      <div class="alert-box info" style="margin-top:16px;">
-        <div class="alert-icon">🏆</div>
-        <div class="alert-text"><strong>Quitar o carro em jan/2027 libera R$2.661/mês.</strong> Esse valor pode ir para amortizar a casa com FGTS, investimentos ou reserva de emergência. Após a quitação, sua saúde financeira muda completamente de patamar.</div>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -1818,6 +1920,48 @@ function showTab(name, el) {
   if (name === 'gastos') carregarGastosCards();
   if (name === 'controle') { carregarControle(); calcReserva(); }
   if (name === 'cartoes') carregarCartoes();
+}
+
+function calcReimb() {
+  const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  // Sum all received inputs
+  let totalRecebido = 0;
+  document.querySelectorAll('.reimb-input').forEach(inp => {
+    totalRecebido += parseFloat(inp.value) || 0;
+  });
+
+  // Sum expected (fixed ones only, skip variável row which has data-esperado="0")
+  let totalEsperado = 0;
+  document.querySelectorAll('#reimb-tbody tr[data-esperado]').forEach(tr => {
+    totalEsperado += parseFloat(tr.getAttribute('data-esperado')) || 0;
+  });
+
+  const falta = Math.max(0, totalEsperado - totalRecebido);
+
+  // Update table footer
+  const totVal = document.getElementById('reimb-total-val');
+  if (totVal) totVal.textContent = fmt(totalRecebido);
+
+  // Update summary cards
+  const cardRec = document.getElementById('reimb-card-recebido');
+  if (cardRec) cardRec.textContent = fmt(totalRecebido);
+
+  const cardEsp = document.getElementById('reimb-card-esperado');
+  if (cardEsp) cardEsp.textContent = fmt(totalEsperado);
+
+  const cardFalta = document.getElementById('reimb-card-falta');
+  if (cardFalta) {
+    cardFalta.textContent = fmt(falta);
+    cardFalta.style.color = falta === 0 ? 'var(--green)' : '#C1121F';
+  }
+
+  // Sync to Fluxo de Caixa reimb input
+  const flReimb = document.getElementById('fl-reimb');
+  if (flReimb) {
+    flReimb.value = totalRecebido.toFixed(2);
+    calcFluxo();
+  }
 }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
