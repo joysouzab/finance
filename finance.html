@@ -1028,6 +1028,12 @@
 </div>
 
 <script>
+// C6 expenses are shared 50/50 — return effective value (÷2 for C6)
+function valorEfetivo(r) {
+  const v = parseFloat(r[2]) || 0;
+  return r[3] === 'C6' ? v / 2 : v;
+}
+
 function addItem(who) {
   const container = document.getElementById(who + '-items');
   const id = Date.now();
@@ -1285,7 +1291,7 @@ async function carregarControle() {
     let totalFixo = 0, totalFlex = 0;
     data.forEach(r => {
       const cat = r[4] || 'Outros';
-      const v = parseFloat(r[2]) || 0;
+      const v = valorEfetivo(r);
       const tipo = r[6] || 'flexivel';
       if (tipo === 'obrigacao') {
         if (!porCatFixo[cat]) porCatFixo[cat] = { total: 0, items: [] };
@@ -1310,10 +1316,11 @@ async function carregarControle() {
         <div style="background:${headerBg};padding:8px 14px;font-size:11px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:1px;">${cat}</div>
         <div style="padding:0 14px;">
           ${items.sort((a,b)=>parseFloat(b[2])-parseFloat(a[2])).map(r => {
-            const v = parseFloat(r[2])||0;
+            const v = valorEfetivo(r);
             const dt = r[0] ? new Date(r[0]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'UTC'}) : '';
+            const c6tag = r[3]==='C6' ? ' <span style="font-size:10px;opacity:0.6">÷2</span>' : '';
             return `<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #e5e3dc;font-size:13px;">
-              <span style="color:var(--muted)">${r[1]}${r[5]?` <span style="font-size:11px">${r[5]}</span>`:''} <span style="font-size:11px;opacity:0.6">${dt}</span></span>
+              <span style="color:var(--muted)">${r[1]}${r[5]?` <span style="font-size:11px">${r[5]}</span>`:''} <span style="font-size:11px;opacity:0.6">${dt}</span>${c6tag}</span>
               <span style="font-weight:500">${fmt(v)}</span>
             </div>`;
           }).join('')}
@@ -1432,7 +1439,7 @@ async function calcReserva() {
     data.forEach(r => {
       const mes = r[0] ? String(r[0]).substring(0,7) : '';
       if (!porMes[mes]) return;
-      const v = parseFloat(r[2]) || 0;
+      const v = valorEfetivo(r);
       const cat = r[4] || 'Outros';
       const tipo = r[6] || 'flexivel';
       porMes[mes].total += v;
@@ -1724,7 +1731,7 @@ async function carregarGastosCards() {
     let totalGeral = 0;
     data.forEach(r => {
       const cat = r[4] || 'Outros';
-      const v = parseFloat(r[2]) || 0;
+      const v = valorEfetivo(r);
       totalGeral += v;
       if (!porCat[cat]) porCat[cat] = { total: 0, items: [] };
       porCat[cat].total += v;
@@ -1759,10 +1766,11 @@ async function carregarGastosCards() {
       let itemsHtml = items
         .sort((a,b) => parseFloat(b[2])-parseFloat(a[2]))
         .map(r => {
-          const v = parseFloat(r[2])||0;
+          const v = valorEfetivo(r);
           const dt = r[0] ? new Date(r[0]).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'UTC'}) : '';
+          const c6tag = r[3]==='C6' ? ' <span class="note">÷2</span>' : '';
           return `<div class="item">
-            <span class="item-name">${r[1]}${r[5] ? ` <span class="note">${r[5]}</span>` : ''} <span class="note">${r[3]} · ${dt}</span></span>
+            <span class="item-name">${r[1]}${r[5] ? ` <span class="note">${r[5]}</span>` : ''} <span class="note">${r[3]} · ${dt}</span>${c6tag}</span>
             <span class="item-val">${fmt(v)}</span>
           </div>`;
         }).join('');
@@ -2094,7 +2102,7 @@ async function carregarOrcamento() {
     const porCat = {};
     let totalGasto = 0;
     data.forEach(r => {
-      const v = parseFloat(r[2]) || 0;
+      const v = valorEfetivo(r);
       const cat = r[4] || 'Outros';
       totalGasto += v;
       porCat[cat] = (porCat[cat] || 0) + v;
