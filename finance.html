@@ -199,15 +199,12 @@
   <div>
     <div class="tabs">
       <button class="tab active" onclick="showTab('registros',this)">✏️ Input</button>
-      <button class="tab" onclick="showTab('gastos',this)">🛍️ Gastos</button>
+      <button class="tab" onclick="showTab('gastos',this)">📊 Análise de Gastos</button>
       <button class="tab" onclick="showTab('controle',this)">🔒 Controle</button>
       <button class="tab" onclick="showTab('fluxo',this)">💰 Fluxo de Caixa</button>
       <button class="tab" onclick="showTab('cartoes',this)">💳 Cartões</button>
       <button class="tab" onclick="showTab('casal',this)">👫 Casal</button>
-      <button class="tab" onclick="showTab('parcelas',this)">📅 Parcelas</button>
       <button class="tab" onclick="showTab('fin',this)">🏠 Financiamentos</button>
-      <button class="tab" onclick="showTab('reimb',this)">💚 Reembolsos</button>
-      <button class="tab" onclick="showTab('proj',this)">📈 Projeção mai–dez</button>
       <button class="tab" onclick="showTab('orcamento',this)">🎯 Orçamento</button>
     </div>
 
@@ -663,9 +660,31 @@
 
     <!-- GASTOS -->
     <div id="tab-gastos" class="tab-content">
-      <div style="margin-bottom:16px;font-size:13px;color:var(--muted);">
-        Gastos do mês agrupados por categoria — vindos do Google Sheets.
-        <span style="color:#780000;margin-left:8px;">⚠️ C6: valores já ÷2</span>
+      <!-- Dashboard resumo -->
+      <div id="gastos-dashboard" style="display:none;margin-bottom:24px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;">
+          <div class="sum-card" id="dash-card-parcela" onclick="filtrarGastosPor('parcela')" style="cursor:pointer;transition:outline 0.15s;">
+            <div class="sum-label">💳 Parcelas</div>
+            <div class="sum-val red" id="dash-parcelas">—</div>
+            <div class="sum-sub" id="dash-parcelas-n"></div>
+          </div>
+          <div class="sum-card" id="dash-card-recorrente" onclick="filtrarGastosPor('recorrente')" style="cursor:pointer;transition:outline 0.15s;">
+            <div class="sum-label">🔁 Recorrentes</div>
+            <div class="sum-val" style="color:#003049" id="dash-recorrentes">—</div>
+            <div class="sum-sub" id="dash-recorrentes-n"></div>
+          </div>
+          <div class="sum-card" id="dash-card-variavel" onclick="filtrarGastosPor('variavel')" style="cursor:pointer;transition:outline 0.15s;">
+            <div class="sum-label">🛍️ Variáveis</div>
+            <div class="sum-val" style="color:#C1121F" id="dash-variaveis">—</div>
+            <div class="sum-sub" id="dash-variaveis-n"></div>
+          </div>
+          <div class="sum-card" style="border-color:#003049">
+            <div class="sum-label">📦 Total do mês</div>
+            <div class="sum-val" style="color:#003049" id="dash-total">—</div>
+            <div class="sum-sub">C6 já ÷2 ⚠️</div>
+          </div>
+        </div>
+        <div id="dash-filter-label" style="display:none;font-size:12px;color:var(--muted);margin-bottom:8px;"></div>
       </div>
       <div id="gastos-cards-summary" style="display:none;margin-bottom:20px;"></div>
       <div id="gastos-cards" class="cat-grid">
@@ -1261,7 +1280,7 @@ async function carregarControle() {
       return;
     }
 
-    // Group by tipo (index 6) then category
+    // Group by tipo: obrigação = tipo obrigacao OR recorrente OR parcela
     const porCatFixo = {};
     const porCatFlex = {};
     let totalFixo = 0, totalFlex = 0;
@@ -1269,7 +1288,9 @@ async function carregarControle() {
       const cat = r[4] || 'Outros';
       const v = valorEfetivo(r);
       const tipo = r[6] || 'flexivel';
-      if (tipo === 'obrigacao') {
+      const marker = r[7];
+      const isObrigacao = tipo === 'obrigacao' || marker === 'parcela';
+      if (isObrigacao) {
         if (!porCatFixo[cat]) porCatFixo[cat] = { total: 0, items: [] };
         porCatFixo[cat].total += v;
         porCatFixo[cat].items.push(r);
@@ -1315,7 +1336,7 @@ async function carregarControle() {
       <!-- OBRIGAÇÕES -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#C1121F;">🔒 Não posso parar</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#C1121F;">🔒 Obrigações</div>
           <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#C1121F;">${fmt(totalFixo)}</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
@@ -1329,7 +1350,7 @@ async function carregarControle() {
       <!-- FLEXÍVEIS -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#003049;">✂️ Posso reduzir</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#003049;">✂️ Posso reduzir/cortar</div>
           <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#003049;">${fmt(totalFlex)}</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
@@ -1346,22 +1367,26 @@ async function carregarControle() {
       <div style="background:rgba(193,18,31,0.06);border:1px solid rgba(193,18,31,0.2);border-radius:var(--radius);padding:18px;">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Obrigações</div>
         <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#C1121F">${fmt(totalFixo)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${Math.round(totalFixo/renda*100)}% da renda</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:8px;">${Math.round(totalFixo/renda*100)}% do salário</div>
+        <div style="background:var(--border);border-radius:100px;height:4px;"><div style="width:${Math.min(100,Math.round(totalFixo/renda*100))}%;height:100%;background:#C1121F;border-radius:100px;"></div></div>
       </div>
       <div style="background:rgba(0,48,73,0.06);border:1px solid rgba(0,48,73,0.2);border-radius:var(--radius);padding:18px;">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Flexíveis</div>
         <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#003049">${fmt(totalFlex)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${Math.round(totalFlex/renda*100)}% da renda</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:8px;">${Math.round(totalFlex/renda*100)}% do salário</div>
+        <div style="background:var(--border);border-radius:100px;height:4px;"><div style="width:${Math.min(100,Math.round(totalFlex/renda*100))}%;height:100%;background:#003049;border-radius:100px;"></div></div>
       </div>
       <div style="background:rgba(42,124,79,0.06);border:1px solid rgba(42,124,79,0.2);border-radius:var(--radius);padding:18px;">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Total gasto</div>
         <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#003049">${fmt(totalGeral)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${Math.round(totalGeral/renda*100)}% da renda</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:8px;">${Math.round(totalGeral/renda*100)}% do salário</div>
+        <div style="background:var(--border);border-radius:100px;height:4px;"><div style="width:${Math.min(100,Math.round(totalGeral/renda*100))}%;height:100%;background:#2a7c4f;border-radius:100px;"></div></div>
       </div>
       <div style="background:rgba(102,155,188,0.08);border:1px solid rgba(102,155,188,0.3);border-radius:var(--radius);padding:18px;">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;">Sobra estimada</div>
         <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#669BBC">${fmt(renda - totalGeral)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">${Math.round((renda-totalGeral)/renda*100)}% da renda</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:8px;">${Math.round((renda-totalGeral)/renda*100)}% do salário</div>
+        <div style="background:var(--border);border-radius:100px;height:4px;"><div style="width:${Math.min(100,Math.round((renda-totalGeral)/renda*100))}%;height:100%;background:#669BBC;border-radius:100px;"></div></div>
       </div>
     </div>`;
 
@@ -1662,6 +1687,18 @@ async function carregarCartoes() {
   }
 }
 
+let _gastosFilterMarker = null;
+
+function filtrarGastosPor(marker) {
+  _gastosFilterMarker = (_gastosFilterMarker === marker) ? null : marker;
+  // Update card styles
+  ['parcela','recorrente','variavel'].forEach(m => {
+    const el = document.getElementById('dash-card-' + m);
+    if (el) el.style.outline = (_gastosFilterMarker === m) ? '2px solid #C1121F' : 'none';
+  });
+  carregarGastosCards();
+}
+
 async function carregarGastosCards() {
   const mes = document.getElementById('mes-global').value;
   const container = document.getElementById('gastos-cards');
@@ -1699,13 +1736,54 @@ async function carregarGastosCards() {
     if (data.length === 0) {
       container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);grid-column:1/-1;">Nenhum gasto em ' + mes + '. Registre pelo Input!</div>';
       summary.style.display = 'none';
+      document.getElementById('gastos-dashboard').style.display = 'none';
       return;
+    }
+
+    // Dashboard summary
+    let totalParcelas = 0, nParcelas = 0;
+    let totalRecorrentes = 0, nRecorrentes = 0;
+    let totalVariaveis = 0, nVariaveis = 0;
+    data.forEach(r => {
+      const v = valorEfetivo(r);
+      const marker = r[7];
+      if (marker === 'parcela') { totalParcelas += v; nParcelas++; }
+      else if (marker === 'recorrente') { totalRecorrentes += v; nRecorrentes++; }
+      else { totalVariaveis += v; nVariaveis++; }
+    });
+    const totalTudo = totalParcelas + totalRecorrentes + totalVariaveis;
+    document.getElementById('dash-parcelas').textContent = fmt(totalParcelas);
+    document.getElementById('dash-parcelas-n').textContent = nParcelas + ' lançamento' + (nParcelas !== 1 ? 's' : '');
+    document.getElementById('dash-recorrentes').textContent = fmt(totalRecorrentes);
+    document.getElementById('dash-recorrentes-n').textContent = nRecorrentes + ' lançamento' + (nRecorrentes !== 1 ? 's' : '');
+    document.getElementById('dash-variaveis').textContent = fmt(totalVariaveis);
+    document.getElementById('dash-variaveis-n').textContent = nVariaveis + ' lançamento' + (nVariaveis !== 1 ? 's' : '');
+    document.getElementById('dash-total').textContent = fmt(totalTudo);
+    document.getElementById('gastos-dashboard').style.display = 'block';
+
+    // Apply marker filter if active
+    const filterLabel = document.getElementById('dash-filter-label');
+    let displayData = data;
+    if (_gastosFilterMarker === 'parcela') {
+      displayData = data.filter(r => r[7] === 'parcela');
+      filterLabel.style.display = 'block';
+      filterLabel.textContent = '📋 Mostrando apenas parcelas — clique no card novamente para ver tudo';
+    } else if (_gastosFilterMarker === 'recorrente') {
+      displayData = data.filter(r => r[7] === 'recorrente');
+      filterLabel.style.display = 'block';
+      filterLabel.textContent = '📋 Mostrando apenas recorrentes — clique no card novamente para ver tudo';
+    } else if (_gastosFilterMarker === 'variavel') {
+      displayData = data.filter(r => r[7] !== 'parcela' && r[7] !== 'recorrente');
+      filterLabel.style.display = 'block';
+      filterLabel.textContent = '📋 Mostrando apenas variáveis — clique no card novamente para ver tudo';
+    } else {
+      filterLabel.style.display = 'none';
     }
 
     // Group by category
     const porCat = {};
     let totalGeral = 0;
-    data.forEach(r => {
+    displayData.forEach(r => {
       const cat = r[4] || 'Outros';
       const v = valorEfetivo(r);
       totalGeral += v;
@@ -1737,7 +1815,8 @@ async function carregarGastosCards() {
     catsOrdenadas.forEach(cat => {
       const { total, items } = porCat[cat];
       const cfg = catConfig[cat] || { emoji:'📦', color:'#888' };
-      const pct = Math.round(total / totalGeral * 100);
+      const SALARIO_LIQUIDO = 15000;
+      const pct = Math.round(total / SALARIO_LIQUIDO * 100);
 
       let itemsHtml = items
         .sort((a,b) => parseFloat(b[2])-parseFloat(a[2]))
@@ -1759,7 +1838,7 @@ async function carregarGastosCards() {
           </div>
           <div class="item-list">${itemsHtml}</div>
           <div class="bar-row">
-            <div class="bar-label"><span>% do total</span><span>${pct}%</span></div>
+            <div class="bar-label"><span>% do salário</span><span>${pct}%</span></div>
             <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
           </div>
         </div>`;
