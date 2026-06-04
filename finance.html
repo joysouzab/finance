@@ -677,31 +677,7 @@
 
     <!-- PARCELAS -->
     <div id="tab-parcelas" class="tab-content">
-      <div class="card" style="padding:0;">
-        <div class="overflow">
-        <table class="inst-table">
-          <thead>
-            <tr><th>Item</th><th>Cartão</th><th>Cat.</th><th>Parcela</th><th>Valor/mês</th><th>Término</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Mounjaro NuPay <span style="font-size:11px;color:var(--accent)">(antecipar 2 próx.)</span></td><td><span class="ctag nu">Nu</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/3</td><td class="pink">R$ 593,15</td><td>Jul/26</td></tr>
-            <tr><td>Remédios rotina (Drogasil)</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/2</td><td class="pink">R$ 266,54</td><td><strong style="color:var(--green)">Jun/26 ✅</strong></td></tr>
-            <tr><td>Remédios mãe (Dom Pedro)</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-familia">Família</span></td><td>2/4</td><td class="yellow">R$ 169,08</td><td>Ago/26</td></tr>
-            <tr><td>Marcenaria Evo*Kless <span style="font-size:11px;color:#780000">C6÷2</span></td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>11/12</td><td class="teal">R$ 794,45</td><td><strong style="color:var(--green)">Jun/26 ✅</strong></td></tr>
-            <tr><td>Tokstok (última)</td><td><span class="ctag itau">Itaú</span></td><td><span class="cbadge b-casa">Casa</span></td><td>10/10</td><td class="teal">R$ 293,15</td><td><strong style="color:var(--green)">Mai/26 ✅</strong></td></tr>
-            <tr><td>Geladeira ML</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>5/10</td><td class="teal">R$ 312,74</td><td>Set/26</td></tr>
-            <tr><td>Trocafone (prima reembolsa)</td><td><span class="ctag itau">Itaú</span></td><td><span class="cbadge b-outros">Reembolso</span></td><td>4/12</td><td>R$ 283,25</td><td>Dez/26</td></tr>
-            <tr><td>Anticoncepcional</td><td><span class="ctag san">San</span></td><td><span class="cbadge b-saude">Saúde</span></td><td>1/3</td><td class="pink">R$ 75,83</td><td>Jun/26</td></tr>
-            <tr><td>Amazon Marketplace</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>3/10</td><td class="teal">R$ 50,22</td><td>Nov/26</td></tr>
-            <tr><td>Mercado Livre (2 compras)</td><td><span class="ctag c6">C6</span></td><td><span class="cbadge b-casa">Casa</span></td><td>3/6</td><td class="teal">R$ 168,42</td><td>Ago/26</td></tr>
-          </tbody>
-        </table>
-        </div>
-        <div style="padding:16px 20px;">
-          <div class="total-row"><span>Total comprometido em parcelas</span><span class="red">~R$ 1.950/mês</span></div>
-          <div style="font-size:12px;color:var(--muted);margin-top:8px;">🎉 <strong style="color:var(--accent)">A partir de julho: Marcenaria + Drogasil + Tokstok encerram — libera ~R$1.353/mês!</strong></div>
-        </div>
-      </div>
+      <div id="parcelas-content"><div style="text-align:center;padding:40px;color:var(--muted)">⏳ Carregando parcelas...</div></div>
     </div>
 
     <!-- FINANCIAMENTOS -->
@@ -1844,6 +1820,9 @@ function mudarMes() {
     if (document.getElementById('tab-orcamento').classList.contains('active')) {
       carregarOrcamento();
     }
+    if (document.getElementById('tab-parcelas').classList.contains('active')) {
+      carregarParcelas();
+    }
   }
 
   // Sync fluxo de caixa mes selector if exists
@@ -1968,7 +1947,7 @@ async function carregarGastos() {
     const porCat = {};
     let total = 0;
     data.forEach(row => {
-      const v = parseFloat(row[2]) || 0;
+      const v = valorEfetivo(row);
       total += v;
       const cat = row[4] || 'Outros';
       porCat[cat] = (porCat[cat] || 0) + v;
@@ -1997,14 +1976,15 @@ async function carregarGastos() {
 
     data.forEach(row => {
       const [dt, desc, valor, cartao, cat, obs] = row;
-      const v = parseFloat(valor) || 0;
+      const v = valorEfetivo(row);
       const cor = catColors[cat] || '#888';
       const dtObj = dt ? new Date(dt) : null;
       const dataFmt = dtObj ? dtObj.toLocaleDateString('pt-BR', {timeZone:'UTC'}) : dt;
+      const c6tag = cartao === 'C6' ? ' <span style="font-size:10px;opacity:0.5">÷2</span>' : '';
       html += `<tr>
         <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;white-space:nowrap;color:var(--muted)">${dataFmt}</td>
         <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc">${desc}${obs ? `<br><span style="font-size:11px;color:var(--muted)">${obs}</span>` : ''}</td>
-        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;color:var(--muted)">${cartao}</td>
+        <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;color:var(--muted)">${cartao}${c6tag}</td>
         <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc"><span style="background:${cor}18;color:${cor};border:1px solid ${cor}40;padding:2px 8px;border-radius:100px;font-size:11px">${cat}</span></td>
         <td style="padding:9px 10px;border-bottom:1px solid #e5e3dc;text-align:right;font-weight:500">R$ ${v.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
       </tr>`;
@@ -2038,6 +2018,8 @@ function showTab(name, el) {
   if (name === 'gastos') carregarGastosCards();
   if (name === 'controle') { carregarControle(); calcReserva(); }
   if (name === 'cartoes') carregarCartoes();
+  if (name === 'parcelas') carregarParcelas();
+  if (name === 'orcamento') carregarOrcamento();
 }
 
 function calcReimb() {
@@ -2082,6 +2064,133 @@ function calcReimb() {
   }
 }
 
+async function carregarParcelas() {
+  const mes = document.getElementById('mes-global').value;
+  const el = document.getElementById('parcelas-content');
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">⏳ Carregando...</div>';
+
+  try {
+    const res = await fetch(SHEETS_URL + '?sheet=parcelas&t=' + Date.now());
+    const rows = await res.json();
+    const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    if (!rows || rows.length <= 1) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Nenhuma parcela cadastrada na aba "Parcelas" do Google Sheets.</div>';
+      return;
+    }
+
+    const [mesAno, mesM] = mes.split('-').map(Number);
+
+    // Parse parcelas: Descrição | Valor | Cartão | Categoria | Total Parcelas | Mês Início (YYYY-MM)
+    const parcelas = rows.slice(1).filter(r => r[0]).map(r => {
+      const desc = r[0], valor = parseFloat(r[1]) || 0, cartao = r[2], cat = r[3];
+      const total = parseInt(r[4]) || 1;
+      const mesInicio = String(r[5]).substring(0, 7); // YYYY-MM
+      const [iniAno, iniM] = mesInicio.split('-').map(Number);
+      const diff = (mesAno - iniAno) * 12 + (mesM - iniM);
+      const numAtual = diff + 1;
+      const ativa = numAtual >= 1 && numAtual <= total;
+      const valorEf = cartao === 'C6' ? valor / 2 : valor;
+
+      // Calculate end month
+      const endMesNum = iniM + total - 1;
+      const endAno = iniAno + Math.floor((endMesNum - 1) / 12);
+      const endM = ((endMesNum - 1) % 12) + 1;
+      const meses_ptbr = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const endStr = meses_ptbr[endM - 1] + '/' + String(endAno).slice(2);
+
+      return { desc, valor, valorEf, cartao, cat, total, numAtual, ativa, endStr, mesInicio };
+    });
+
+    const ativas = parcelas.filter(p => p.ativa);
+    const encerradas = parcelas.filter(p => !p.ativa && p.numAtual > p.total);
+    const futuras = parcelas.filter(p => p.numAtual < 1);
+    const totalMes = ativas.reduce((s, p) => s + p.valorEf, 0);
+
+    const catColors = {
+      'Casa':'#003049','Alimentação':'#780000','Restaurantes':'#C1121F',
+      'Saúde':'#c084fc','Gastos Pessoais':'#669BBC','Assinatura':'#888',
+      'Transporte':'#f0c44c','Família':'#C1121F','Pet':'#2a7c4f','Outros':'#888'
+    };
+    const cartaoColors = {'C6':'#003049','Santander':'#C1121F','Itaú':'#f0c44c','Nubank':'#669BBC','Nu':'#669BBC'};
+
+    const renderRow = (p) => {
+      const pct = Math.round((p.numAtual > 0 ? Math.min(p.numAtual, p.total) : 0) / p.total * 100);
+      const cor = catColors[p.cat] || '#888';
+      const ccor = cartaoColors[p.cartao] || '#888';
+      const encerrada = p.numAtual > p.total;
+      const futura = p.numAtual < 1;
+      const c6tag = p.cartao === 'C6' ? ' <span style="font-size:10px;opacity:0.5">÷2</span>' : '';
+      return `
+        <div style="padding:14px 20px;border-bottom:1px solid #e5e3dc;${encerrada?'opacity:0.45':''}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13px;font-weight:500">${p.desc}${c6tag}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+                <span style="background:${ccor}20;color:${ccor};border:1px solid ${ccor}40;padding:1px 7px;border-radius:100px;margin-right:6px">${p.cartao}</span>
+                <span style="background:${cor}18;color:${cor};border:1px solid ${cor}40;padding:1px 7px;border-radius:100px">${p.cat}</span>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-size:15px;font-weight:600;color:${encerrada?'var(--green)':'#C1121F'}">${encerrada ? '✅ Encerrada' : (futura ? '⏳ Futura' : fmt(p.valorEf) + '/mês')}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">${encerrada || futura ? '' : `parcela ${p.numAtual}/${p.total} · até ${p.endStr}`}</div>
+              ${futura ? `<div style="font-size:11px;color:var(--muted)">inicia ${p.mesInicio} · ${p.total}x ${fmt(p.valorEf)}</div>` : ''}
+            </div>
+          </div>
+          ${!encerrada ? `
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;">
+              <span>${futura ? '0' : Math.min(p.numAtual,p.total)}/${p.total} parcelas</span><span>${futura ? 0 : pct}%</span>
+            </div>
+            <div style="background:var(--border);border-radius:100px;height:5px;">
+              <div style="width:${futura?0:pct}%;height:100%;background:${cor};border-radius:100px;transition:width 0.3s;"></div>
+            </div>
+          </div>` : ''}
+        </div>`;
+    };
+
+    let html = '';
+
+    // Summary card
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+        <div class="sum-card"><div class="sum-label">Ativas este mês</div><div class="sum-val red">${fmt(totalMes)}</div><div class="sum-sub">${ativas.length} parcela${ativas.length!==1?'s':''}</div></div>
+        <div class="sum-card"><div class="sum-label">Total de parcelas</div><div class="sum-val" style="color:#003049">${parcelas.length}</div><div class="sum-sub">${encerradas.length} encerrada${encerradas.length!==1?'s':''}</div></div>
+      </div>
+    </div>`;
+
+    // Active
+    if (ativas.length > 0) {
+      html += `<div class="card" style="padding:0;margin-bottom:16px;">
+        <div style="padding:14px 20px;background:var(--surface2);border-radius:16px 16px 0 0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Ativas em ${mes}</div>
+        ${ativas.map(renderRow).join('')}
+      </div>`;
+    }
+
+    // Future
+    if (futuras.length > 0) {
+      html += `<div class="card" style="padding:0;margin-bottom:16px;">
+        <div style="padding:14px 20px;background:var(--surface2);border-radius:16px 16px 0 0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Futuras</div>
+        ${futuras.map(renderRow).join('')}
+      </div>`;
+    }
+
+    // Encerradas
+    if (encerradas.length > 0) {
+      html += `<div class="card" style="padding:0;">
+        <div style="padding:14px 20px;background:var(--surface2);border-radius:16px 16px 0 0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Encerradas</div>
+        ${encerradas.map(renderRow).join('')}
+      </div>`;
+    }
+
+    el.innerHTML = html;
+
+  } catch(err) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:#C1121F">❌ Erro ao carregar parcelas. Verifique o Apps Script.</div>';
+    console.error(err);
+  }
+}
+
 async function carregarOrcamento() {
   const mes = document.getElementById('mes-global').value;
   const fmt = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -2097,7 +2206,7 @@ async function carregarOrcamento() {
       return;
     }
 
-    const data = rows.slice(1).filter(r => r[0] && String(r[0]).substring(0,7) === mes && (r[6] || 'flexivel') === 'flexivel');
+    const data = rows.slice(1).filter(r => r[0] && String(r[0]).substring(0,7) === mes && (r[6] || 'flexivel') === 'flexivel' && r[7] !== 'recorrente' && r[7] !== 'parcela');
 
     const porCat = {};
     let totalGasto = 0;
