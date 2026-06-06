@@ -1024,43 +1024,57 @@
 
       <!-- Form: add item -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:24px;">
-        <div style="font-family:'DM Serif Display',serif;font-size:17px;color:#003049;margin-bottom:14px;">✨ Adicionar item</div>
-        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px;">
-          <input type="url" id="wl-url" placeholder="Cole o link do produto aqui..." style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;width:100%;" onkeydown="if(event.key==='Enter')buscarWishlist()">
-          <button onclick="buscarWishlist()" id="wl-buscar-btn" style="background:#003049;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">🔍 Buscar</button>
-        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:17px;color:#003049;margin-bottom:16px;">✨ Adicionar item</div>
 
-        <!-- Preview (hidden until fetch) -->
-        <div id="wl-preview" style="display:none;">
-          <div style="display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:start;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;">
-            <img id="wl-prev-img" src="" alt="" style="width:120px;height:120px;object-fit:cover;border-radius:10px;background:#eee;">
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div>
-                <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Nome</label>
-                <input type="text" id="wl-prev-nome" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:start;margin-bottom:16px;">
+
+          <!-- Zona de foto -->
+          <div>
+            <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:6px;">Foto</label>
+            <div id="wl-drop-zone" onclick="document.getElementById('wl-file-input').click()" onpaste="wlHandlePaste(event)" tabindex="0"
+              style="width:130px;height:130px;border:2px dashed var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--surface2);position:relative;overflow:hidden;gap:6px;"
+              ondragover="event.preventDefault();this.style.borderColor='#C1121F'" ondragleave="this.style.borderColor=''" ondrop="wlHandleDrop(event)">
+              <img id="wl-prev-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;">
+              <div id="wl-drop-hint" style="text-align:center;pointer-events:none;">
+                <div style="font-size:22px;margin-bottom:4px;">📷</div>
+                <div style="font-size:10px;color:var(--muted);line-height:1.4;">Ctrl+V ou<br>clique para<br>escolher</div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div>
-                  <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Preço (R$)</label>
-                  <input type="number" id="wl-prev-preco" step="0.01" placeholder="0,00" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
-                </div>
-                <div>
-                  <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Categoria</label>
-                  <select id="wl-prev-cat" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
-                    <option value="Geral">✨ Geral</option>
-                    <option value="Casa">🏠 Casa</option>
-                  </select>
-                </div>
+              <button id="wl-remove-img" onclick="wlRemoveImg(event)" style="display:none;position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.5);border:none;border-radius:50%;width:22px;height:22px;color:white;font-size:12px;cursor:pointer;line-height:22px;padding:0;">×</button>
+            </div>
+            <input type="file" id="wl-file-input" accept="image/*" style="display:none;" onchange="wlHandleFile(this)">
+          </div>
+
+          <!-- Campos -->
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Nome do item</label>
+              <input type="text" id="wl-prev-nome" placeholder="Ex: Argola oval prateada" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Preço (R$)</label>
+                <input type="number" id="wl-prev-preco" step="0.01" placeholder="0,00" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+              </div>
+              <div>
+                <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Categoria</label>
+                <select id="wl-prev-cat" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+                  <option value="Geral">✨ Geral</option>
+                  <option value="Casa">🏠 Casa</option>
+                </select>
               </div>
             </div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <button onclick="salvarWishlist()" style="background:#C1121F;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;">💾 Salvar na wishlist</button>
-            <button onclick="cancelarWishlist()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--muted);cursor:pointer;">Cancelar</button>
-            <span id="wl-save-status" style="font-size:13px;"></span>
+            <div>
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:block;margin-bottom:4px;">Link (opcional)</label>
+              <input type="url" id="wl-url" placeholder="https://..." style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;width:100%;">
+            </div>
           </div>
         </div>
-        <div id="wl-fetch-status" style="font-size:13px;color:var(--muted);"></div>
+
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button onclick="salvarWishlist()" style="background:#C1121F;color:white;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;">💾 Salvar na wishlist</button>
+          <button onclick="cancelarWishlist()" style="background:transparent;border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--muted);cursor:pointer;">Limpar</button>
+          <span id="wl-save-status" style="font-size:13px;"></span>
+        </div>
       </div>
 
       <!-- Wishlist grid -->
@@ -2164,76 +2178,110 @@ function showTab(name, el) {
   if (name === 'cartoes') carregarCartoes();
   if (name === 'parcelas') carregarParcelas();
   if (name === 'orcamento') carregarOrcamento();
-  if (name === 'wishlist') carregarWishlist();
+  if (name === 'wishlist') {
+    carregarWishlist();
+    // Ativa paste global enquanto wishlist está aberta
+    document.addEventListener('paste', wlHandlePaste);
+  } else {
+    document.removeEventListener('paste', wlHandlePaste);
+  }
 }
 
 // ── WISHLIST ──────────────────────────────────────────────
-let _wlUrl = '';
+let _wlImgData = '';
 
-async function buscarWishlist() {
-  const url = document.getElementById('wl-url').value.trim();
-  if (!url) return;
-  _wlUrl = url;
-  const status = document.getElementById('wl-fetch-status');
-  const btn = document.getElementById('wl-buscar-btn');
-  status.textContent = '⏳ Buscando informações do produto...';
-  document.getElementById('wl-preview').style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = '...';
-  try {
-    const res = await fetch(SHEETS_URL + '?action=scrape&url=' + encodeURIComponent(url) + '&t=' + Date.now());
-    const data = await res.json();
-    if (data.erro) throw new Error(data.erro);
+function wlCompressImage(file, cb) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 280;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+      else { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
-    document.getElementById('wl-prev-img').src = data.image || '';
-    document.getElementById('wl-prev-img').style.display = data.image ? 'block' : 'none';
-    document.getElementById('wl-prev-nome').value = data.title || '';
-    document.getElementById('wl-prev-preco').value = data.price || '';
-    document.getElementById('wl-preview').style.display = 'block';
-    status.textContent = data.image || data.title ? '✅ Confira e ajuste os dados antes de salvar.' : '⚠️ Não consegui extrair todos os dados — preencha manualmente.';
-  } catch(err) {
-    status.textContent = '❌ Erro ao buscar. Preencha os dados manualmente.';
-    document.getElementById('wl-prev-nome').value = '';
-    document.getElementById('wl-prev-preco').value = '';
-    document.getElementById('wl-prev-img').src = '';
-    document.getElementById('wl-preview').style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '🔍 Buscar';
+function wlSetImage(dataUrl) {
+  _wlImgData = dataUrl;
+  const imgEl = document.getElementById('wl-prev-img');
+  const hint = document.getElementById('wl-drop-hint');
+  const removeBtn = document.getElementById('wl-remove-img');
+  imgEl.src = dataUrl;
+  imgEl.style.display = 'block';
+  hint.style.display = 'none';
+  removeBtn.style.display = 'block';
+  document.getElementById('wl-drop-zone').style.border = 'none';
+}
+
+function wlRemoveImg(e) {
+  e.stopPropagation();
+  _wlImgData = '';
+  const imgEl = document.getElementById('wl-prev-img');
+  imgEl.src = ''; imgEl.style.display = 'none';
+  document.getElementById('wl-drop-hint').style.display = 'flex';
+  document.getElementById('wl-remove-img').style.display = 'none';
+  document.getElementById('wl-drop-zone').style.border = '2px dashed var(--border)';
+}
+
+function wlHandleFile(input) {
+  if (input.files && input.files[0]) wlCompressImage(input.files[0], wlSetImage);
+}
+
+function wlHandlePaste(e) {
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      wlCompressImage(item.getAsFile(), wlSetImage);
+      return;
+    }
   }
+}
+
+function wlHandleDrop(e) {
+  e.preventDefault();
+  document.getElementById('wl-drop-zone').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) wlCompressImage(file, wlSetImage);
 }
 
 async function salvarWishlist() {
   const nome = document.getElementById('wl-prev-nome').value.trim();
   const preco = parseFloat(document.getElementById('wl-prev-preco').value) || 0;
   const cat = document.getElementById('wl-prev-cat').value;
-  const img = document.getElementById('wl-prev-img').src;
+  const link = document.getElementById('wl-url').value.trim();
   const status = document.getElementById('wl-save-status');
   if (!nome) { status.textContent = '⚠️ Informe o nome do item.'; return; }
   status.textContent = '⏳ Salvando...';
   try {
     const res = await fetch(SHEETS_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'wishlist_add', nome, preco, categoria: cat, imagem: img, link: _wlUrl })
+      body: JSON.stringify({ action: 'wishlist_add', nome, preco, categoria: cat, imagem: _wlImgData, link })
     });
     const data = await res.json();
     if (data.status !== 'ok') throw new Error(data.message);
     status.textContent = '✅ Salvo!';
-    setTimeout(() => {
-      cancelarWishlist();
-      carregarWishlist();
-    }, 800);
+    setTimeout(() => { cancelarWishlist(); carregarWishlist(); }, 800);
   } catch(err) {
     status.textContent = '❌ Erro ao salvar.';
   }
 }
 
 function cancelarWishlist() {
+  document.getElementById('wl-prev-nome').value = '';
+  document.getElementById('wl-prev-preco').value = '';
   document.getElementById('wl-url').value = '';
-  document.getElementById('wl-preview').style.display = 'none';
-  document.getElementById('wl-fetch-status').textContent = '';
   document.getElementById('wl-save-status').textContent = '';
-  _wlUrl = '';
+  document.getElementById('wl-file-input').value = '';
+  wlRemoveImg({ stopPropagation: () => {} });
 }
 
 async function carregarWishlist() {
