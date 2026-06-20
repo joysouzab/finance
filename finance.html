@@ -1669,25 +1669,35 @@ async function calcReserva() {
 
     const data = rows.slice(1);
 
-    // Sardinha: custos_fixos + parcelas = fixo (essencial para reserva)
-    const sardinhaFixo = ['custos_fixos'];
+    // Reserva de emergência: classificação por CATEGORIA (não pelo tipo Sardinha),
+    // pois "obrigação" aqui significa "não posso deixar de pagar numa emergência" —
+    // conceito diferente do bucket de orçamento Sardinha.
+    const categoriasObrigacao = ['Fixos','Casa','Alimentação','Saúde','Transporte','Pet','Família'];
 
     // Calculate per month
     const porMes = {};
     mesesDisponiveis.forEach(m => { porMes[m] = { fixo: 0, flex: 0, total: 0, cats: {} }; });
+
+    // Acumula totais por categoria, já separados em fixo/flex
+    const catsFixoTotals = {};
+    const catsFlexTotals = {};
 
     data.forEach(r => {
       const mes = r[0] ? String(r[0]).substring(0,7) : '';
       if (!porMes[mes]) return;
       const v = valorEfetivo(r);
       const cat = r[4] || 'Outros';
-      const tipo = r[6] || 'conforto';
       const marker = r[7];
       porMes[mes].total += v;
       porMes[mes].cats[cat] = (porMes[mes].cats[cat] || 0) + v;
-      const isFixo = sardinhaFixo.includes(tipo) || marker === 'parcela';
-      if (isFixo) porMes[mes].fixo += v;
-      else porMes[mes].flex += v;
+      const isFixo = categoriasObrigacao.includes(cat) || marker === 'parcela';
+      if (isFixo) {
+        porMes[mes].fixo += v;
+        catsFixoTotals[cat] = (catsFixoTotals[cat] || 0) + v;
+      } else {
+        porMes[mes].flex += v;
+        catsFlexTotals[cat] = (catsFlexTotals[cat] || 0) + v;
+      }
     });
 
     const mesesComDados = mesesDisponiveis.filter(m => porMes[m].total > 0);
@@ -1697,14 +1707,11 @@ async function calcReserva() {
     const mediaFlex = mesesComDados.reduce((s,m) => s + porMes[m].flex, 0) / n;
     const mediaTotal = mediaFixo + mediaFlex;
 
-    // Category averages
-    const allCats = {};
-    mesesComDados.forEach(m => {
-      Object.entries(porMes[m].cats).forEach(([cat, val]) => {
-        allCats[cat] = (allCats[cat] || 0) + val;
-      });
-    });
-    Object.keys(allCats).forEach(c => allCats[c] /= n);
+    // Médias por categoria, já separadas em fixo/flex
+    const allCatsFixo = {};
+    const allCatsFlex = {};
+    Object.entries(catsFixoTotals).forEach(([c,v]) => { allCatsFixo[c] = v / n; });
+    Object.entries(catsFlexTotals).forEach(([c,v]) => { allCatsFlex[c] = v / n; });
 
     const reservaNecessaria = mediaFixo * mesesAlvo;
     const reservaTotal = mediaTotal * mesesAlvo;
@@ -1770,7 +1777,7 @@ async function calcReserva() {
     // Fixas
     html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;">
       <div style="font-weight:600;font-size:14px;color:#C1121F;margin-bottom:14px;">🔒 Média obrigações/mês</div>`;
-    Object.entries(allCats).filter(([c]) => catsFixas.includes(c)).sort((a,b)=>b[1]-a[1]).forEach(([cat,val]) => {
+    Object.entries(allCatsFixo).sort((a,b)=>b[1]-a[1]).forEach(([cat,val]) => {
       const cor = catColors[cat]||'#888';
       html += `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e5e3dc;font-size:13px;">
         <span style="color:var(--muted)">${cat}</span>
@@ -1784,7 +1791,7 @@ async function calcReserva() {
     // Flexíveis
     html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;">
       <div style="font-weight:600;font-size:14px;color:#003049;margin-bottom:14px;">✂️ Média flexíveis/mês</div>`;
-    Object.entries(allCats).filter(([c]) => !catsFixas.includes(c)).sort((a,b)=>b[1]-a[1]).forEach(([cat,val]) => {
+    Object.entries(allCatsFlex).sort((a,b)=>b[1]-a[1]).forEach(([cat,val]) => {
       const cor = catColors[cat]||'#888';
       html += `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e5e3dc;font-size:13px;">
         <span style="color:var(--muted)">${cat}</span>
